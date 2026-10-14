@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="civilian" vClass="passenger" accel="2.0" decel="4.5" sigma="0.5" length="5.0" maxSpeed="13.89"/>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1" accel="2.6" decel="5.0" sigma="0.2" length="6.0" maxSpeed="16.67"/>
+
+    <route id="west_to_east" edges="west_in east_out"/>
+    <route id="east_to_west" edges="east_in west_out"/>
+    <route id="north_to_south" edges="north_in south_out"/>
+    <route id="south_to_north" edges="south_in north_out"/>
+
+    <flow id="civilian_east_west" type="civilian" route="east_to_west" begin="0" end="120" period="3" departLane="best" departSpeed="max"/>
+    <flow id="civilian_north_south" type="civilian" route="north_to_south" begin="0" end="120" period="4" departLane="best" departSpeed="max"/>
+    <vehicle id="ambulance_0" type="ambulance" route="west_to_east" depart="20" departLane="best" departSpeed="max"/>
+</routes>

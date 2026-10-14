@@ -21,6 +21,9 @@ venv/
 simulation/maps/raw/
 simulation/maps/generated/
 simulation/scenarios/generated/
+simulation/sumo/basic/basic.net.xml
+simulation/sumo/basic/output/*
+!simulation/sumo/basic/output/.gitkeep
 *.sumo.log
 *.tripinfo.xml
 *.fcd.xml
