@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments and local settings
+.venv/
+venv/
+.env
+
+# IDE and OS
+.DS_Store
+.idea/
+.vscode/
+
+# Generated SUMO artefacts and local map downloads
+simulation/maps/raw/
+simulation/maps/generated/
+simulation/scenarios/generated/
+*.sumo.log
+*.tripinfo.xml
+*.fcd.xml
+*.netstate.xml
+
+# Experiment outputs and notebooks
+experiments/results/*
+!experiments/results/.gitkeep
+experiments/notebooks/.ipynb_checkpoints/
+
+# Training artefacts
+ai/training/checkpoints/
+ray_results/

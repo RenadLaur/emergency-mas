@@ -1,0 +1,17 @@
+name: emergency-mas
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - numpy
+  - pandas
+  - networkx
+  - matplotlib
+  - osmnx
+  - pytest
+  - pyyaml
+  - pip:
+      - eclipse-sumo==1.28.0
+      - sumolib==1.28.0
+      - traci==1.28.0
