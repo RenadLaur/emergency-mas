@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мангилик Ел — Сарайшык · проверка мостов</title>
+<style>
+body{margin:0;background:#e8edee;color:#182b36;font:15px system-ui}header{padding:16px 22px;background:#fff}h1{font-size:20px;margin:0 0 8px}p{margin:6px 0}nav{display:flex;gap:18px;flex-wrap:wrap;padding:12px 22px}label{display:flex;gap:8px;align-items:center}canvas{display:block;width:100%;height:70vh;touch-action:none}button{padding:8px 14px}small{display:block;padding:12px 22px}input{max-width:140px}
+</style>
+<header><h1>Мангилик Ел — Сарайшык</h1><p>Проверочная 3D-геометрия SUMO · не живая симуляция</p><p>Высота моста 6,5 м — допущение. Полотно, ограждения и опоры схематичные, не по инженерным чертежам.</p></header>
+<nav><label>Поворот <input id="yaw" type="range" min="-180" max="180" value="-20"></label><label>Наклон <input id="tilt" type="range" min="10" max="90" value="35"></label><label>Высота ×<output id="factor">3</output><input id="height" type="range" min="1" max="6" step="0.5" value="3"></label><label>Масштаб <input id="zoom" type="range" min="0.5" max="8" step="0.1" value="4"></label><button id="reset">Сброс</button></nav>
+<canvas id="scene" role="img" aria-label="Объёмный вид дорог и мостов. Меняйте поворот, наклон и масштаб ползунками."></canvas>
+<small id="status"></small>
+<script>
+const data=/*NETWORK_DATA*/null;
+const canvas=document.getElementById('scene'), ctx=canvas.getContext('2d');
+const fields=Object.fromEntries(['yaw','tilt','height','zoom'].map(id=>[id,document.getElementById(id)]));
+function draw(){
+ if(!data){document.getElementById('status').textContent='Сначала запустите build_bridge_preview.py';return;}
+ const w=canvas.clientWidth,h=canvas.clientHeight,dpr=devicePixelRatio||1;canvas.width=w*dpr;canvas.height=h*dpr;ctx.scale(dpr,dpr);ctx.fillStyle='#e8edee';ctx.fillRect(0,0,w,h);
+ const yaw=fields.yaw.value*Math.PI/180,t=fields.tilt.value*Math.PI/180,ex=+fields.height.value,s=Math.min(w,h)/1500*fields.zoom.value;
+ document.getElementById('factor').textContent=ex;
+ function transform(p){let x=p[0]*Math.cos(yaw)-p[1]*Math.sin(yaw),y=p[0]*Math.sin(yaw)+p[1]*Math.cos(yaw);return [w/2+x*s,h/2-(y*Math.sin(t)+p[2]*ex*Math.cos(t))*s,y*Math.cos(t)-p[2]*ex*Math.sin(t)];}
+ const faces=[];
+ function face(points,color){const q=points.map(transform);faces.push({q,color,depth:q.reduce((a,p)=>a+p[2],0)/q.length});}
+ // Draw actual SUMO junction pavement, not just narrow vehicle trajectories.
+ // It stays at the junction's own Z, so different levels remain separated.
+ for(const polygon of data.junctions||[]) face(polygon,'#526875');
+ for(const [x,y,z] of data.supports){const p=[[x-1,y-1,0],[x+1,y-1,0],[x+1,y+1,0],[x-1,y+1,0]];for(let i=0;i<4;i++){const a=p[i],b=p[(i+1)%4];face([a,b,[b[0],b[1],z-.8],[a[0],a[1],z-.8]],i%2?'#9daeb6':'#b6c1c7');}}
+ function ribbon(a,b,width,color){const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<.01)return;
+ const nx=-dy/length*width/2,ny=dx/length*width/2;
+ const p=[[a[0]+nx,a[1]+ny,a[2]],[b[0]+nx,b[1]+ny,b[2]],[b[0]-nx,b[1]-ny,b[2]],[a[0]-nx,a[1]-ny,a[2]]];face(p,color);
+ if(Math.min(a[2],b[2])>2){for(const [i,j] of [[0,1],[3,2]])face([p[i],p[j],[p[j][0],p[j][1],p[j][2]-.8],[p[i][0],p[i][1],p[i][2]-.8]],'#748793');}
+ }
+ for(const lane of data.lanes){const ps=lane.points;for(let i=1;i<ps.length;i++){const a=ps[i-1],b=ps[i];ribbon(a,b,lane.width,lane.internal?'#687c83':'#526875');}}
+ // Paint lane boundaries, not invented turn arrows or stop lines.
+ for(const lane of data.lanes){if(lane.internal)continue;const ps=lane.points;for(let i=1;i<ps.length;i++){
+ const a=ps[i-1],b=ps[i],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy);if(len<.01)continue;
+ const nx=-dy/len*lane.width/2,ny=dx/len*lane.width/2;
+ const l=[a[0]+nx,a[1]+ny,a[2]+.04],r=[b[0]+nx,b[1]+ny,b[2]+.04];ribbon(l,r,.10,'#d6e0e3');
+ // Railings only on external boundaries of elevated edges.
+ if(lane.id.endsWith('_0')&&Math.min(a[2],b[2])>3){face([[a[0]-nx,a[1]-ny,a[2]],[b[0]-nx,b[1]-ny,b[2]],[b[0]-nx,b[1]-ny,b[2]+1],[a[0]-nx,a[1]-ny,a[2]+1]],'#b9c7ce');}
+ }}
+ faces.sort((a,b)=>b.depth-a.depth);for(const f of faces){ctx.beginPath();f.q.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=f.color;ctx.fill();}
+ document.getElementById('status').textContent=`${data.lanes.length} полос с внутренними траекториями · Z: ${data.z_range.join('…')} м · вертикальный масштаб ×${ex}. Исходная рабочая карта не заменена.`;
+}
+for(const el of Object.values(fields))el.addEventListener('input',draw);
+document.getElementById('reset').onclick=()=>{for(const [k,v] of Object.entries({yaw:-20,tilt:35,height:3,zoom:4}))fields[k].value=v;draw();};
+new ResizeObserver(draw).observe(canvas);draw();
+</script></html>

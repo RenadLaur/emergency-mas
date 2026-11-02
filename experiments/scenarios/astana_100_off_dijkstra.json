@@ -1,0 +1,12 @@
+{
+  "run_id": "astana-100-off-dijkstra-seed42",
+  "network": "simulation/maps/astana_city/generated/astana_city.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 100,
+  "emergency_vehicles": 2,
+  "ordinary_departure_window_seconds": 600,
+  "emergency_departures_seconds": [60, 240],
+  "tls_mode": "off",
+  "routing_strategy": "dijkstra",
+  "reroute_period_seconds": 30
+}

@@ -1,0 +1,26 @@
+{
+  "scope": "Astana left bank: Nura and Esil districts",
+  "audit_levels": [
+    {
+      "level": 1,
+      "name": "whole-area structural validation",
+      "checks": ["network connectivity", "one-way roads", "bridges", "tunnels", "layers", "traffic-light controllers"]
+    },
+    {
+      "level": 2,
+      "name": "primary-road visual audit",
+      "checks": ["lane counts", "ramps", "turn permissions", "grade separation", "signal placement"]
+    },
+    {
+      "level": 3,
+      "name": "emergency-corridor detailed audit",
+      "checks": ["lane-to-lane connections", "stop lines", "crossings", "signal phases", "emergency priority", "incident detours"]
+    }
+  ],
+  "initial_priority_objects": [
+    "bridges across the Esil River",
+    "grade-separated junctions on major avenues",
+    "Mangilik El Avenue and Almaty Street",
+    "routes connecting ambulance stations, fire stations and hospitals"
+  ]
+}

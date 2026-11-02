@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "policy": "Explicit corrections only; inferred continuity is not surveyed ground truth. Never widen ramps by road name.",
+  "groups": [
+    {
+      "ways": ["39362507"],
+      "tags": {"lanes": "6", "lanes:forward": "3", "lanes:backward": "3"},
+      "status": "source_supported",
+      "evidence": "Six lanes described at https://astana.zagranitsa.com/place/19770/most-saryarka; both adjacent OSM ways have six total lanes. 2GIS immersive bridge deck failed to render on review; current marking requires confirmation."
+    },
+    {
+      "ways": ["698225897", "698225927", "688297712", "698225896", "698225928", "762778578"],
+      "tags": {"lanes": "3"},
+      "status": "inferred_continuity",
+      "evidence": "Explicit modelling assumption for the missing-lanes Mangilik El main carriageways, consistent with the reviewed three-lane corridor to the north and user report. Lower road hidden in 2GIS immersive rendering; not visually verified. Does not apply to slip roads."
+    },
+    {
+      "ways": ["107829245", "975252023", "975252026", "975252028", "975252029", "1167852419"],
+      "tags": {"lanes": "4"},
+      "status": "inferred_continuity",
+      "evidence": "Missing-lanes Alash main carriageway segments between explicit four-lane segments 23979646/975252024/975252025/262346413; user requests elimination of unsupported narrowing. Four lanes is a modelling assumption pending independent marking survey, not a verified field count."
+    }
+  ]
+}

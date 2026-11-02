@@ -1,0 +1,17 @@
+{
+  "run_id": "basic-blue-light-smoke-seed42",
+  "network": "simulation/sumo/basic/basic.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 10,
+  "emergency_vehicles": 1,
+  "ordinary_departure_window_seconds": 40,
+  "emergency_departures_seconds": [10],
+  "tls_mode": "normal",
+  "routing_strategy": "dijkstra",
+  "emergency_tactics": {
+    "mode": "blue_light",
+    "lateral_resolution_meters": 0.4,
+    "reaction_distance_meters": 50,
+    "speed_factor": 1.15
+  }
+}

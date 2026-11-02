@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges>
+    <edge id="approach" from="west" to="middle" numLanes="2" speed="13.89"/>
+    <edge id="exit" from="middle" to="east" numLanes="2" speed="13.89"/>
+</edges>

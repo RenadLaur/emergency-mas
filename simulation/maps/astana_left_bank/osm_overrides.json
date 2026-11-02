@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "policy": "Only visually reviewed corrections are allowed. Raw OSM snapshots remain immutable.",
+  "way_overrides": [
+    {
+      "osm_way_id": "165816979",
+      "area": "Mangilik El — Saraishyk: southbound main carriageway",
+      "tags": {
+        "lanes": "3"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735041697",
+      "area": "Mangilik El — Saraishyk: northbound main carriageway",
+      "tags": {
+        "lanes": "3"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735041698",
+      "area": "Mangilik El — Saraishyk: southbound southern approach",
+      "tags": {
+        "lanes": "3"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "688297715",
+      "area": "Mangilik El — Saraishyk: northbound southern approach",
+      "tags": {
+        "lanes": "3"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "24672587",
+      "area": "Mangilik El — Saraishyk: northwest outer ramp",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "165975916",
+      "area": "Mangilik El — Saraishyk: southwest outer ramp",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "37883864",
+      "area": "Mangilik El — Saraishyk: northeast outer ramp",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "24672593",
+      "area": "Mangilik El — Saraishyk: northeast ramp bridge",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "24672599",
+      "area": "Mangilik El — Saraishyk: southeast outer ramp",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "37883874",
+      "area": "Mangilik El — Saraishyk: southeast ramp bridge",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "37883866",
+      "area": "Mangilik El — Saraishyk: southern loop approach",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1381198546",
+      "area": "Mangilik El — Saraishyk: southern loop bridge",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "24672609",
+      "area": "Mangilik El — Saraishyk: northern loop approach",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1381198544",
+      "area": "Mangilik El — Saraishyk: northern loop bridge",
+      "tags": {
+        "lanes": "2"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1186145848",
+      "area": "Mangilik El — Saraishyk: eastbound Saraishyk bridge approach",
+      "tags": {
+        "lanes": "4"
+      },
+      "evidence": "2GIS immersive visual review 2026-10-15, https://2gis.kz/astana?m=71.4401%2C51.1324%2F18.5&immersive=on and user-provided interchange screenshot. Lane-marking count, not a surveyed road plan. Short single-lane connectors remain unchanged.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "258048023",
+      "area": "Kosmonavtov near Narkesken",
+      "tags": {"lanes": "2", "lanes:forward": "1", "lanes:backward": "1"},
+      "evidence": "2GIS immersive visual audit 2026-10-15, https://2gis.kz/astana?m=71.4251%2C51.146%2F19&immersive=on. Single center marking, one lane in each direction; directional tags incorrectly repeated total=2.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1526317898",
+      "area": "Kabanbay Batyr immediately north of widening toward Almaty",
+      "tags": {"lanes": "6", "lanes:forward": "3", "lanes:backward": "3", "busway:right": null, "busway:left": "lane"},
+      "evidence": "2GIS immersive visual audit 2026-10-15, https://2gis.kz/astana?m=71.41215%2C51.12035%2F20&immersive=on. Three lanes in each direction; dedicated bus lane on east/northbound side (backward in OSM).",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "535921238",
+      "area": "Kabanbay Batyr north of Almaty: contradictory total lane count",
+      "tags": {"lanes": "7", "lanes:forward": "4", "lanes:backward": "3", "busway:right": null, "busway:left": "lane"},
+      "evidence": "2GIS immersive visual audit 2026-10-15, https://2gis.kz/astana?m=71.41198%2C51.1194%2F20&immersive=on. Four southbound and three northbound lanes; bus lane is east/northbound (OSM backward), with an additional stop bay excluded from lane count.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1175582593",
+      "area": "Kabanbay Batyr near cardiology clinic: contradictory forward lanes",
+      "tags": {"lanes": "5", "lanes:forward": "2", "lanes:backward": "3"},
+      "evidence": "2GIS immersive visual audit 2026-10-15, https://2gis.kz/astana?m=71.41344%2C51.1275%2F19.5&immersive=on. Two southbound and three northbound through lanes, excluding bus-stop bay. OSM forward=5 incorrectly repeated the total.",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "255969483",
+      "area": "Mangilik El canal bridge, west carriageway",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "255969484",
+      "area": "Mangilik El canal bridge, east carriageway",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "501197215",
+      "area": "Mangilik El between canal bridge and southern widening, east carriageway",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "501197220",
+      "area": "Mangilik El between canal bridge and southern widening, west carriageway",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1446156777",
+      "area": "Mangilik El widened section south of Uly Dala, east carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS lane-marking visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1531638142",
+      "area": "Mangilik El widened section south of Uly Dala, west carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS lane-marking visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1531638144",
+      "area": "Mangilik El approach to Uly Dala, east carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS lane-marking visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "501197217",
+      "area": "Mangilik El approach to Uly Dala, west carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS lane-marking visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "501197214",
+      "area": "Mangilik El at Uly Dala, east carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS lane-marking visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "501197216",
+      "area": "Mangilik El at Uly Dala, west carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS lane-marking visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "522977372",
+      "area": "Mangilik El north of Uly Dala, west carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043818",
+      "area": "Mangilik El north of Uly Dala, east carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1154972681",
+      "area": "Mangilik El south of Triumphal Arch taper, west carriageway",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1446612883",
+      "area": "Mangilik El south of Triumphal Arch taper, east carriageway segment",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "1446612884",
+      "area": "Mangilik El south of Triumphal Arch taper, east carriageway segment",
+      "tags": {"lanes": "4"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "724874966",
+      "area": "Mangilik El north of Triumphal Arch, west carriageway",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "724874967",
+      "area": "Mangilik El north of Triumphal Arch, east carriageway",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043815",
+      "area": "Mangilik El Triumphal Arch, west north segment",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043816",
+      "area": "Mangilik El Triumphal Arch, west central segment",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043817",
+      "area": "Mangilik El Triumphal Arch, east north segment",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043819",
+      "area": "Mangilik El Triumphal Arch, west south segment",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043820",
+      "area": "Mangilik El Triumphal Arch, east central segment",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    },
+    {
+      "osm_way_id": "735043821",
+      "area": "Mangilik El Triumphal Arch, east south segment",
+      "tags": {"lanes": "3"},
+      "evidence": "2GIS top-down visual audit, 2026-10-15",
+      "status": "visually_verified"
+    }
+  ]
+}

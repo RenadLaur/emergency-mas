@@ -6,6 +6,7 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+cache/
 
 # Environments and local settings
 .venv/
@@ -18,12 +19,34 @@ venv/
 .vscode/
 
 # Generated SUMO artefacts and local map downloads
+simulation/maps/astana_city/raw/
+simulation/maps/astana_city/generated/
 simulation/maps/raw/
 simulation/maps/generated/
+simulation/maps/astana_pilot/raw/*
+!simulation/maps/astana_pilot/raw/.gitkeep
+simulation/maps/astana_pilot/generated/*
+!simulation/maps/astana_pilot/generated/.gitkeep
+simulation/maps/astana_pilot/import_manifest.json
+simulation/maps/astana_pilot/validation_report.json
+simulation/maps/astana_pilot/traffic_light_inventory.json
+simulation/maps/astana_left_bank/raw/*
+!simulation/maps/astana_left_bank/raw/.gitkeep
+simulation/maps/astana_left_bank/generated/*
+!simulation/maps/astana_left_bank/generated/.gitkeep
+simulation/maps/astana_left_bank/import_manifest.json
+simulation/maps/astana_left_bank/validation_report.json
+simulation/maps/astana_left_bank/traffic_light_inventory.json
+simulation/maps/astana_left_bank/infrastructure_inventory.json
 simulation/scenarios/generated/
 simulation/sumo/basic/basic.net.xml
 simulation/sumo/basic/output/*
 !simulation/sumo/basic/output/.gitkeep
+simulation/sumo/rescue_lane/rescue_lane.net.xml
+simulation/sumo/rescue_lane/output/*
+!simulation/sumo/rescue_lane/output/.gitkeep
+simulation/sumo/traffic_light_priority/output/*
+!simulation/sumo/traffic_light_priority/output/.gitkeep
 *.sumo.log
 *.tripinfo.xml
 *.fcd.xml

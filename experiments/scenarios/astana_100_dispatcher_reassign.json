@@ -1,0 +1,16 @@
+{
+  "run_id": "astana-100-dispatcher-reassign-seed42",
+  "network": "simulation/maps/astana_city/generated/astana_city.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 100,
+  "emergency_vehicles": 2,
+  "ordinary_departure_window_seconds": 600,
+  "tls_mode": "normal",
+  "routing_strategy": "dijkstra",
+  "dispatcher": {
+    "enabled": true,
+    "unit_count": 2,
+    "call_times_seconds": [60, 240],
+    "forced_first_assignment_unavailable_after_seconds": 60
+  }
+}

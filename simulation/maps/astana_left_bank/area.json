@@ -1,0 +1,22 @@
+{
+  "name": "astana_left_bank",
+  "city": "Astana, Kazakhstan",
+  "scope_definition": "Union of the OSM administrative boundaries of Nura and Esil districts; this is the project's reproducible engineering boundary for the left bank.",
+  "osm_relations": [
+    {
+      "name": "Nura district",
+      "relation_id": 20593940
+    },
+    {
+      "name": "Esil district",
+      "relation_id": 3479876
+    }
+  ],
+  "reference_bounds_west_south_east_north": [71.217973, 50.857608, 71.608270, 51.189307],
+  "source": "OpenStreetMap administrative relations via SUMO osmGet.py",
+  "coverage_policy": {
+    "whole_area": "Automated road, level, bridge and traffic-light coverage",
+    "primary_roads": "Visual audit against public map imagery",
+    "emergency_corridors": "Detailed lane-level correction and SUMO validation"
+  }
+}

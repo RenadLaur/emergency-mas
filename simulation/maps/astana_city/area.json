@@ -1,0 +1,8 @@
+{
+  "name": "astana_city",
+  "osm_city_relation": 3087156,
+  "bounds": [71.2179735, 50.8576076, 71.7851913, 51.3511101],
+  "boundary_source": "Nominatim city=Astana&country=Kazakhstan, 2026-10-15",
+  "scope": "City bounding rectangle, both banks, with complete ways crossing its border; not clipped to the administrative polygon",
+  "license": "OpenStreetMap contributors, ODbL 1.0"
+}

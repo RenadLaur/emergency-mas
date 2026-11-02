@@ -1,0 +1,17 @@
+{
+  "run_id": "astana-100-normal-yielding-seed42",
+  "network": "simulation/maps/astana_city/generated/astana_city.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 100,
+  "emergency_vehicles": 2,
+  "ordinary_departure_window_seconds": 600,
+  "emergency_departures_seconds": [60, 240],
+  "tls_mode": "normal",
+  "routing_strategy": "dijkstra",
+  "civilian_yielding": {
+    "enabled": true,
+    "detection_range_meters": 90,
+    "slowdown_factor": 0.45,
+    "slowdown_duration_seconds": 4
+  }
+}

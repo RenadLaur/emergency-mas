@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import json
-import shutil
 from pathlib import Path
 
 import traci
+import sumolib
 
 from build_network import build_network
 
@@ -20,9 +20,7 @@ AMBULANCE_ID = "ambulance_0"
 def run_scenario() -> dict[str, float | int | bool]:
     """Run until the scenario ends and return observable emergency-vehicle events."""
     build_network()
-    sumo = shutil.which("sumo")
-    if sumo is None:
-        raise RuntimeError("sumo is unavailable; activate the emergency-mas environment")
+    sumo = sumolib.checkBinary("sumo")
 
     departed = False
     arrival_time: float | None = None

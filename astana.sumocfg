@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Whole-city network with reviewed overrides; opens paused, two probe cars. -->
+<configuration>
+    <input>
+        <net-file value="simulation/maps/astana_city/generated/astana_city.net.xml"/>
+        <route-files value="simulation/maps/astana_city/generated/coverage.rou.xml"/>
+    </input>
+    <time><begin value="0"/><end value="7200"/></time>
+    <random_number><seed value="42"/></random_number>
+    <processing><time-to-teleport value="-1"/></processing>
+    <gui_only><delay value="100"/></gui_only>
+</configuration>

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import shutil
 import subprocess
 from pathlib import Path
+
+import sumolib
 
 
 SCENARIO_DIR = Path(__file__).resolve().parent
@@ -13,9 +14,7 @@ NETWORK_FILE = SCENARIO_DIR / "basic.net.xml"
 
 def build_network() -> Path:
     """Generate the network and return the path to it."""
-    netconvert = shutil.which("netconvert")
-    if netconvert is None:
-        raise RuntimeError("netconvert is unavailable; activate the emergency-mas environment")
+    netconvert = sumolib.checkBinary("netconvert")
 
     subprocess.run(
         [

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "height_policy": "All Z values are relative modelling assumptions, not surveyed elevations. Source lanes and legal movements are preserved.",
+  "profiles": [
+    {
+      "id": "saryarka", "title": "Сарыарка — Туран: мостовой переход",
+      "bounds": [71.403,51.152,71.420,51.164], "center": [71.4114,51.1577],
+      "anchors": {"39362507": 6.5},
+      "transitions": ["39362501","1485516391"],
+      "evidence": "OSM bridge=yes/layer=1 on way 39362507; map naming differs from colloquial Saryarka bridge. Heights assumed.",
+      "review_url": "https://2gis.kz/astana?m=71.4114%2C51.1577%2F18&immersive=on"
+    },
+    {
+      "id": "kabanbay", "title": "Кабанбай Батыра — Караоткель",
+      "bounds": [71.419,51.145,71.435,51.157], "center": [71.4280,51.1518],
+      "anchors": {"23983613":6.5,"1526317849":6.5,"107829237":-6.5,"107829319":-6.5},
+      "transitions": ["28695630","259714717","1537667073","23979536","1537667094","1537667096","1537667097","1537667099","107829238","107829259","107829328","107829337"],
+      "evidence": "OSM river bridge plus separate Respublika/Tashenov tunnel approaches. No claimed surveyed deck or tunnel depth.",
+      "review_url": "https://2gis.kz/astana?m=71.4280%2C51.1518%2F18&immersive=on"
+    },
+    {
+      "id": "kaldayakov_arys", "title": "Калдаякова — Арыс: мост через Есиль",
+      "bounds": [71.438,51.116,71.457,51.125], "center": [71.4460,51.1205],
+      "anchors": {"24844148":6.5,"165802523":6.5},
+      "transitions": ["165802530","166194470","641203804","641203806"],
+      "evidence": "OSM Arys bridge connects Syganak and Kaldayakov. Kept separate from Mangilik El underpass.",
+      "review_url": "https://2gis.kz/astana?m=71.4460%2C51.1205%2F18&immersive=on"
+    },
+    {
+      "id": "mangilik_underpass", "title": "Мангилик Ел снизу — Сыганак / направление Калдаякова сверху",
+      "bounds": [71.429,51.116,71.444,51.128], "center": [71.4365,51.1220],
+      "anchors": {"165802521":0,"165802528":0,"698225897":-6.5,"698225927":-6.5},
+      "transitions": ["688297712","698225896","698225928","762778578","165761871","165761873","165762200","165762201","165762720","165763906","165764246","165801846","1525246411"],
+      "separate_groups": [["165802521","165802528"],["698225897","698225927"]],
+      "evidence": "User explicitly identifies descending Mangilik El and crossing upper corridor. 2GIS visual review 2026-10-21 shows Syganak over the depressed main route; OSM uses bridge ways for the upper crossing. Depth assumed, not surveyed.",
+      "review_url": "https://2gis.kz/astana?m=71.4365%2C51.1220%2F18&immersive=on"
+    },
+    {
+      "id": "alash", "title": "Алаш — Богенбай Батыра — Акжол: эстакада и съезды",
+      "bounds": [71.432,51.175,71.456,51.192], "center": [71.4445,51.1835],
+      "anchors": {"23979646":6.0,"107829245":6.0,"975252023":6.0,"975252024":6.0,"975252025":6.0,"975252026":6.0,"975252028":6.0,"975252029":6.0},
+      "transitions": ["23979303","453658660","262346413","1167852419","107829331","753631458","753631463","660558453","660558454"],
+      "evidence": "OSM bridge/layer inventory and official Astana transport infrastructure list identify Alash — Bogenbay Batyr interchange. Other Alash bridges remain separate inventory candidates.",
+      "review_url": "https://2gis.kz/astana?m=71.4445%2C51.1835%2F17&immersive=on"
+    }
+  ]
+}

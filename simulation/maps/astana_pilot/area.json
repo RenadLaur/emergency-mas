@@ -1,0 +1,9 @@
+{
+  "name": "astana_ishim_central_pilot",
+  "city": "Astana, Kazakhstan",
+  "bbox_west_south_east_north": [71.385, 51.118, 71.465, 51.173],
+  "purpose": "Pilot import for validating roads, traffic lights, bridges and overpasses before city-wide import.",
+  "source": "OpenStreetMap via SUMO osmGet.py",
+  "download_date": null,
+  "osm_snapshot_note": "Raw OSM data is local and ignored by Git; record its download date in import_manifest.json."
+}

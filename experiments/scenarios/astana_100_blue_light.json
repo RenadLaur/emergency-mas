@@ -1,0 +1,17 @@
+{
+  "run_id": "astana-100-blue-light-seed42",
+  "network": "simulation/maps/astana_city/generated/astana_city.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 100,
+  "emergency_vehicles": 2,
+  "ordinary_departure_window_seconds": 600,
+  "emergency_departures_seconds": [60, 240],
+  "tls_mode": "normal",
+  "routing_strategy": "dijkstra",
+  "emergency_tactics": {
+    "mode": "blue_light",
+    "lateral_resolution_meters": 0.4,
+    "reaction_distance_meters": 75,
+    "speed_factor": 1.15
+  }
+}

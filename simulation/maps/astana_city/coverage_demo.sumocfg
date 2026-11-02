@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <input>
+        <net-file value="generated/astana_city.net.xml"/>
+        <route-files value="generated/coverage.rou.xml"/>
+    </input>
+    <time><begin value="0"/><end value="7200"/></time>
+    <random_number><seed value="42"/></random_number>
+    <processing><time-to-teleport value="-1"/></processing>
+    <gui_only><delay value="100"/></gui_only>
+</configuration>

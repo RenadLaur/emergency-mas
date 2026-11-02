@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="civilian" vClass="passenger" accel="1.5" decel="4.5" sigma="0.2"
+           length="5.0" maxSpeed="5.0"/>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1"
+           accel="2.6" decel="5.0" sigma="0.1" length="6.0" maxSpeed="16.67" speedFactor="1.15">
+        <param key="has.bluelight.device" value="true"/>
+    </vType>
+
+    <route id="corridor" edges="approach exit"/>
+    <flow id="queue" type="civilian" route="corridor" begin="0" end="12" number="12"
+          departLane="free" departSpeed="max"/>
+    <vehicle id="ambulance_0" type="ambulance" route="corridor" depart="15"
+             departLane="free" departSpeed="max"/>
+</routes>
