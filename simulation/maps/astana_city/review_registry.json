@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "purpose": "Traceable manual-review register for bridge and complex-intersection geometry. An entry is not field-verified unless its status and evidence say so.",
+  "status_policy": {
+    "inventory_pending": "Named by project scope, but exact geometry/OSM objects are not yet inventoried.",
+    "requires_manual_review": "Located in the imported network, but lanes, movements or levels are not confirmed.",
+    "modelled_assumption": "A local model exists, using explicitly documented non-survey assumptions.",
+    "verified_geometry": "Geometry was checked against a dated declared source; not a claim of engineering certification."
+  },
+  "entries": [
+    {
+      "id": "saryarka_turan",
+      "title": "Сарыарка — Туран: мостовой переход",
+      "kind": "bridge",
+      "status": "modelled_assumption",
+      "center": [71.4114, 51.1577],
+      "related_profile": "saryarka",
+      "osm_way_ids": ["39362507"],
+      "checks": ["bridge_level", "approach_lane_continuity", "turn_connections", "vehicle_route"],
+      "evidence": ["OSM bridge/layer tags", "documented lane override; marking still requires review"],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Confirm current lane marking and approach width.", "Confirm bridge-deck height independently before city-wide Z export."]
+    },
+    {
+      "id": "kabanbay_karaotkel",
+      "title": "Кабанбай Батыра — Караоткель / Республика — Ташенова",
+      "kind": "bridge_and_tunnel_interchange",
+      "status": "modelled_assumption",
+      "center": [71.428, 51.1518],
+      "related_profile": "kabanbay",
+      "osm_way_ids": ["23983613", "1526317849", "107829237", "107829319"],
+      "checks": ["bridge_level", "tunnel_level", "separate_levels", "ramp_lane_count", "turn_connections", "vehicle_route"],
+      "evidence": ["OSM bridge/tunnel inventory", "local profile has only relative heights"],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Confirm lane counts on approaches and ramps.", "Confirm no false connection between bridge and tunnel levels."]
+    },
+    {
+      "id": "kaldayakov_arys",
+      "title": "Калдаякова — Арыс: мост через Есиль",
+      "kind": "bridge",
+      "status": "modelled_assumption",
+      "center": [71.446, 51.1205],
+      "related_profile": "kaldayakov_arys",
+      "osm_way_ids": ["24844148", "165802523"],
+      "checks": ["bridge_level", "approach_lane_continuity", "turn_connections", "vehicle_route"],
+      "evidence": ["OSM bridge inventory", "local relative-height profile"],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Confirm approach lanes and permitted turns.", "Confirm elevation profile before export to full city."]
+    },
+    {
+      "id": "mangilik_syganak",
+      "title": "Мангилик Ел — Сыганак: нижний ход и верхнее направление Калдаякова",
+      "kind": "grade_separated_interchange",
+      "status": "modelled_assumption",
+      "center": [71.4365, 51.122],
+      "related_profile": "mangilik_underpass",
+      "osm_way_ids": ["165802521", "165802528", "698225897", "698225927"],
+      "checks": ["separate_levels", "mainline_lane_continuity", "ramp_lane_count", "turn_connections", "vehicle_route"],
+      "evidence": ["OSM bridge inventory", "documented relative-height profile and explicit lane assumptions"],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Confirm the lower/upper carriageway geometry.", "Confirm the transition lanes and ramp widths."]
+    },
+    {
+      "id": "alash_bogenbay_akzhol",
+      "title": "Алаш — Богенбай Батыра — Акжол: эстакада и съезды",
+      "kind": "grade_separated_interchange",
+      "status": "modelled_assumption",
+      "center": [71.4445, 51.1835],
+      "related_profile": "alash",
+      "osm_way_ids": ["23979646", "107829245", "975252023", "975252024"],
+      "checks": ["separate_levels", "mainline_lane_continuity", "ramp_lane_count", "turn_connections", "vehicle_route"],
+      "evidence": ["OSM bridge inventory", "documented inferred-continuity lane assumptions"],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Confirm which Alash bridge ways belong to the same operational interchange.", "Confirm four-lane assumption on each marked mainline segment."]
+    },
+    {
+      "id": "mangilik_sarayshyk",
+      "title": "Мангилик Ел — Сарайшык: развязка и съезды",
+      "kind": "grade_separated_interchange",
+      "status": "modelled_assumption",
+      "center": [71.4387, 51.1325],
+      "related_profile": "mangilik_corridor",
+      "osm_way_ids": ["1186145847", "1186145848"],
+      "checks": ["mainline_lane_continuity", "ramp_lane_count", "separate_levels", "turn_connections", "vehicle_route"],
+      "evidence": ["OSM bridge=yes/layer=1 inventory for both Saraishyk carriageways; relative +6.5 m deck height remains a modelling assumption."],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Confirm the assumed relative deck height.", "Confirm all ramp lane counts and permitted movements against an official scheme or field survey."]
+    },
+    {
+      "id": "imanov_bridge",
+      "title": "Иманова — мост Беласар: два проезда по две полосы",
+      "kind": "bridge",
+      "status": "requires_manual_review",
+      "center": [71.4651, 51.1584],
+      "related_profile": null,
+      "osm_way_ids": ["1537667048", "846023745"],
+      "checks": ["bridge_level", "two_lanes_each_direction", "approach_lane_continuity", "turn_connections", "vehicle_route"],
+      "scene_layers": [
+        {
+          "id": "upper_bridge_carriageways",
+          "kind": "vehicle_road",
+          "osm_way_ids": ["1537667048", "846023745"],
+          "status": "mapped",
+          "notes": "Two one-way carriageways, two lanes each; part of the SUMO transport network."
+        },
+        {
+          "id": "lower_vehicle_context",
+          "kind": "vehicle_road",
+          "osm_way_ids": ["622653202", "622653200", "622653208", "622653209"],
+          "status": "mapped_candidate",
+          "notes": "Candidate lower service-road sequence. Way 622653202 is explicitly highway=service, covered=yes, layer=-1; adjacent service ways require topology review. Do not connect it to the upper bridge without a legal SUMO movement."
+        },
+        {
+          "id": "pedestrian_parking_context",
+          "kind": "pedestrian_and_parking",
+          "osm_way_ids": [],
+          "status": "visual_context_pending",
+          "notes": "Reported pedestrian/parking area under the bridge. It is a 3D context layer, not a SUMO vehicle lane; exact OSM parking/pedestrian polygons still require identification."
+        }
+      ],
+      "evidence": ["Project requirement: preserve two lanes in each direction and avoid artificial narrowing at both ends.", "Current OSM inventory locates adjacent Belasar bridge carriageways 1537667048 and 846023745. Each is highway=secondary, bridge=yes, oneway=yes, lanes=2 and connects to Imanov approaches in the compiled SUMO network."],
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "open_questions": ["Determine the full upper/lower-road elevation profile: a provisional 6.5 m deck produced an invalid 99% grade on a short approach, so no height is currently applied.", "Confirm lane marking and allowed turns from an independent current source before declaring verified geometry."]
+    }
+  ]
+}

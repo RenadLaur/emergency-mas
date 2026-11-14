@@ -1,0 +1,17 @@
+{
+  "run_id": "astana-100-safety-seed42",
+  "network": "simulation/maps/astana_city/generated/astana_city.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 100,
+  "emergency_vehicles": 2,
+  "ordinary_departure_window_seconds": 600,
+  "experiment_end_seconds": 240,
+  "emergency_departures_seconds": [30, 90],
+  "tls_mode": "normal",
+  "routing_strategy": "traffic_aware",
+  "safety": {
+    "enabled": true,
+    "ttc_threshold_seconds": 2.0,
+    "observation_period_seconds": 2.0
+  }
+}

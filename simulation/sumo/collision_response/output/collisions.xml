@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-11T12:49:52.740426+05:00 by Eclipse SUMO sumo 1.28.0
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="/Users/lorenzo/Documents/Codex/2026-10-14/new-chat/emergency-mas/simulation/sumo/collision_response/collision_response.net.xml"/>
+        <route-files value="/Users/lorenzo/Documents/Codex/2026-10-14/new-chat/emergency-mas/simulation/sumo/collision_response/collision_response.rou.xml"/>
+    </input>
+
+    <output>
+        <collision-output value="/Users/lorenzo/Documents/Codex/2026-10-14/new-chat/emergency-mas/simulation/sumo/collision_response/output/collisions.xml"/>
+    </output>
+
+    <time>
+        <step-length value="0.1"/>
+    </time>
+
+    <processing>
+        <collision.action value="warn"/>
+        <collision.stoptime value="60"/>
+        <collision.mingap-factor value="0"/>
+        <time-to-teleport value="-1"/>
+    </processing>
+
+    <report>
+        <duration-log.disable value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <traci_server>
+        <remote-port value="52110"/>
+    </traci_server>
+
+    <random_number>
+        <seed value="42"/>
+    </random_number>
+
+</sumoConfiguration>
+-->
+
+<collisions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/collision_file.xsd">
+    <collision time="7.30" type="collision" lane="approach_0" pos="181.25" collider="unsafe_vehicle" victim="stalled_vehicle" colliderType="civilian" victimType="civilian" colliderSpeed="24.82" victimSpeed="0.00" colliderFront="181.25,-1.60" colliderBack="176.25,-1.60" victimFront="185.00,-1.60" victimBack="180.00,-1.60"/>
+</collisions>

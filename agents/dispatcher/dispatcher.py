@@ -12,6 +12,12 @@ class UnitStatus(StrEnum):
     UNAVAILABLE = "unavailable"
 
 
+class UnitType(StrEnum):
+    AMBULANCE = "ambulance"
+    POLICE = "police"
+    FIRE_RESCUE = "fire_rescue"
+
+
 class CallStatus(StrEnum):
     PENDING = "pending"
     ASSIGNED = "assigned"
@@ -25,6 +31,8 @@ class EmergencyUnit:
     edge_id: str
     status: UnitStatus = UnitStatus.AVAILABLE
     active_call_id: str | None = None
+    # Kept last so existing positional construction remains valid.
+    unit_type: UnitType = UnitType.AMBULANCE
 
 
 @dataclass
@@ -36,6 +44,9 @@ class EmergencyCall:
     assigned_unit_id: str | None = None
     completed_time_seconds: float | None = None
     assignments: list["Assignment"] = field(default_factory=list)
+    # A call requests exactly one resource class. A road incident may create
+    # several linked calls (police, ambulance, fire-rescue).
+    required_unit_type: UnitType = UnitType.AMBULANCE
 
 
 @dataclass(frozen=True)
@@ -45,6 +56,7 @@ class Assignment:
     path: tuple[str, ...]
     estimated_seconds: float
     attempt: int
+    unit_type: UnitType = UnitType.AMBULANCE
 
 
 RouteProvider = Callable[[EmergencyUnit, EmergencyCall], tuple[tuple[str, ...], float] | None]
@@ -70,7 +82,7 @@ class NearestFreeDispatcher:
             return None
         candidates: list[tuple[float, str, tuple[str, ...]]] = []
         for unit in self.units.values():
-            if unit.status is not UnitStatus.AVAILABLE:
+            if unit.status is not UnitStatus.AVAILABLE or unit.unit_type is not call.required_unit_type:
                 continue
             route = route_provider(unit, call)
             if route is not None:
@@ -81,7 +93,7 @@ class NearestFreeDispatcher:
             return None
         estimate, unit_id, path = min(candidates, key=lambda row: (row[0], row[1]))
         unit = self.units[unit_id]
-        assignment = Assignment(call_id, unit_id, path, estimate, len(call.assignments) + 1)
+        assignment = Assignment(call_id, unit_id, path, estimate, len(call.assignments) + 1, unit.unit_type)
         call.assignments.append(assignment)
         call.status = CallStatus.ASSIGNED
         call.assigned_unit_id = unit_id

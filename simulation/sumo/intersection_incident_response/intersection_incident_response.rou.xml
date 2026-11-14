@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="civilian" vClass="passenger" length="5" accel="2.3" decel="4.5"
+           sigma="0.45" maxSpeed="13.89" lcStrategic="0" lcCooperative="0"
+           lcSpeedGain="0" lcKeepRight="0"/>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1"
+           length="6" accel="2.8" decel="5.5" sigma="0.1" maxSpeed="16.67"
+           lcStrategic="0" lcCooperative="0" lcSpeedGain="0" lcKeepRight="0"/>
+    <vType id="police" vClass="emergency" guiShape="police" color="0,0.35,1"
+           length="5.5" accel="2.8" decel="5.5" sigma="0.1" maxSpeed="16.67"/>
+    <vType id="fire_rescue" vClass="emergency" guiShape="firebrigade" color="1,0.1,0.1"
+           length="8" accel="2.2" decel="5.0" sigma="0.1" maxSpeed="15.28"/>
+
+    <route id="west_to_east" edges="west_in east_out"/>
+    <route id="east_to_west" edges="east_in west_out"/>
+    <route id="north_to_south" edges="north_in south_out"/>
+    <route id="south_to_north" edges="south_in north_out"/>
+
+    <flow id="west_queue" type="civilian" route="west_to_east" begin="0" end="38"
+          period="1.5" departLane="1" departSpeed="max"/>
+    <flow id="cross_north_south" type="civilian" route="north_to_south" begin="0" end="42"
+          period="2.3" departLane="free" departSpeed="max"/>
+    <flow id="cross_east_west" type="civilian" route="east_to_west" begin="3" end="40"
+          period="3.2" departLane="free" departSpeed="max"/>
+    <vehicle id="transit_ambulance" type="ambulance" route="west_to_east" depart="14"
+             departLane="1" departSpeed="max"/>
+</routes>

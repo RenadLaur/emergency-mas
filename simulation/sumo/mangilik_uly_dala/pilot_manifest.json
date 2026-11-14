@@ -1,0 +1,22 @@
+{
+  "status": "selected_for_controlled_pilot_geometry_review_required",
+  "title": "Мангилик Ел × Улы Дала",
+  "junction_id": "cluster_1773372178_1773372179_1773372182_1773430682",
+  "tls_id": "GS_cluster_1773372178_1773372179_1773372182_1773430682",
+  "longitude": 71.4269519,
+  "latitude": 51.0955265,
+  "source_network": "simulation/maps/astana_city/generated/corridors/mangilik/network.net.xml",
+  "model_inventory": {
+    "mangilik_lanes_each_direction": 4,
+    "uly_dala_incoming_lanes_by_approach": [1, 2],
+    "uly_dala_outgoing_lanes_by_approach": [1, 1],
+    "controlled_links": 20
+  },
+  "scope": "straight-through controlled experiment with 100 civilian vehicles and one ambulance",
+  "limitations": [
+    "The corridor cutout preserves source lane attributes and movements but has artificial outer boundaries.",
+    "SUMO traffic-light phases are model phases, not confirmed controller timings from Astana.",
+    "The current lane inventory comes from the project OSM snapshot and requires manual field or official-scheme review.",
+    "Traffic demand is synthetic and must not be described as measured Astana traffic volume."
+  ]
+}

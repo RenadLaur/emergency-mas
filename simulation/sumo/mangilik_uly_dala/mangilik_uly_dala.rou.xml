@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="civilian" vClass="passenger" length="5" accel="2.3" decel="4.5"
+           sigma="0.45" minGap="2.5" maxSpeed="16.67"/>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1"
+           length="6" accel="2.8" decel="5.5" sigma="0.1" minGap="3"
+           maxSpeed="19.44"/>
+
+    <route id="mangilik_to_northwest" edges="1531638144#6 522977372#0"/>
+    <route id="mangilik_to_southeast" edges="735043818#6 501197217#0"/>
+    <route id="uly_dala_to_southwest" edges="501197213#32 521162951#0"/>
+    <route id="uly_dala_to_northeast" edges="734375698#7 243133841#0"/>
+
+    <flow id="civilian_mangilik_nw" type="civilian" route="mangilik_to_northwest"
+          begin="0" end="120" number="25" departLane="best" departSpeed="max"/>
+    <flow id="civilian_mangilik_se" type="civilian" route="mangilik_to_southeast"
+          begin="0" end="120" number="25" departLane="best" departSpeed="max"/>
+    <flow id="civilian_uly_sw" type="civilian" route="uly_dala_to_southwest"
+          begin="0" end="120" number="25" departLane="best" departSpeed="max"/>
+    <flow id="civilian_uly_ne" type="civilian" route="uly_dala_to_northeast"
+          begin="0" end="120" number="25" departLane="best" departSpeed="max"/>
+    <vehicle id="ambulance_0" type="ambulance" route="mangilik_to_northwest"
+             depart="35" departLane="best" departSpeed="max"/>
+</routes>

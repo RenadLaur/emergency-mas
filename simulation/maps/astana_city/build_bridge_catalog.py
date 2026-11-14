@@ -1,5 +1,6 @@
 """Reproducible local elevation overlays; no changes to the working city net."""
 import hashlib
+import heapq
 import html
 import json
 import math
@@ -27,12 +28,15 @@ def original_ids(edge):
 def elevate(root, profile):
     edges = [e for e in root.findall('edge') if e.get('function') != 'internal']
     anchors = profile['anchors']
-    fixed, graph, matched = {}, {}, set()
+    fixed, graph, length_graph, matched = {}, {}, {}, set()
     for e in edges:
         a, b = e.get('from'), e.get('to')
-        weight = 1 / max(float(e.find('lane').get('length')), 1)
+        edge_length = max(float(e.find('lane').get('length')), 1)
+        weight = 1 / edge_length
         graph.setdefault(a, []).append((b, weight))
         graph.setdefault(b, []).append((a, weight))
+        length_graph.setdefault(a, []).append((b, edge_length))
+        length_graph.setdefault(b, []).append((a, edge_length))
         for key in original_ids(e) & anchors.keys():
             matched.add(key)
             for node in (a, b):
@@ -48,11 +52,28 @@ def elevate(root, profile):
         if nodes & prior_nodes:
             raise ValueError('Upper and lower roads share a junction')
         prior_nodes.update(nodes)
+    transition_nodes = set()
+    transition_radius = profile.get('transition_radius_meters')
+    if transition_radius:
+        distances = {node: 0.0 for node in fixed}
+        queue = [(0.0, node) for node in fixed]
+        heapq.heapify(queue)
+        while queue:
+            distance, node = heapq.heappop(queue)
+            if distance != distances[node] or distance > transition_radius:
+                continue
+            transition_nodes.add(node)
+            for neighbour, edge_length in length_graph.get(node, []):
+                candidate = distance + edge_length
+                if candidate <= transition_radius and candidate < distances.get(neighbour, math.inf):
+                    distances[neighbour] = candidate
+                    heapq.heappush(queue, (candidate, neighbour))
     allowed = set(anchors) | set(profile['transitions'])
     for e in edges:
         if not original_ids(e) & allowed:
             for node in (e.get('from'), e.get('to')):
-                fixed.setdefault(node, 0.)
+                if node not in transition_nodes:
+                    fixed.setdefault(node, 0.)
     heights = {n: fixed.get(n, 0.) for n in graph}
     free = sorted(heights.keys() - fixed.keys())
     for _ in range(10000):
@@ -91,8 +112,29 @@ def elevate(root, profile):
         if abs(shapes[src][-1][2]-shapes[dst][0][2]) > .001:
             raise ValueError(f'Vertical discontinuity {src} -> {dst}')
     return {'anchors_matched': sorted(matched), 'vertical_discontinuities': 0,
+            'transition_radius_meters': transition_radius,
             'max_grade_percent': max(grades)[0],
             'steep_edges': sorted([g for g in grades if g[0] > 8], reverse=True)}
+
+
+def check_expected_lanes(root, profile):
+    """Verify explicitly documented lane counts without changing the network."""
+    expected = profile.get('expected_lanes', {})
+    if not expected:
+        return {}
+    matched = {way: [] for way in expected}
+    for edge in root.findall('edge'):
+        if edge.get('function') == 'internal':
+            continue
+        for way in original_ids(edge) & expected.keys():
+            count = len(edge.findall('lane'))
+            if count != expected[way]:
+                raise ValueError(f'{profile["id"]}: {way}/{edge.get("id")} has {count} lanes, expected {expected[way]}')
+            matched[way].append(edge.get('id'))
+    missing = [way for way, edges in matched.items() if not edges]
+    if missing:
+        raise ValueError(f'{profile["id"]}: expected lane anchors missing from cutout: {missing}')
+    return matched
 
 
 def build(profile, source):
@@ -105,6 +147,7 @@ def build(profile, source):
     tree = ET.parse(flat); root = tree.getroot()
     # Only geometry is edited: prove all lane attributes and connections survive.
     before = [(e.tag, dict(e.attrib)) for e in root.iter() if e.tag in ('lane','connection')]
+    lane_checks = check_expected_lanes(root, profile)
     checks = elevate(root, profile)
     after = [(e.tag, dict(e.attrib)) for e in root.iter() if e.tag in ('lane','connection')]
     for records in (before, after):
@@ -128,7 +171,8 @@ def build(profile, source):
         subprocess.run([sumolib.checkBinary('sumo'), '-n', str(target), '-r', str(out/'check.rou.xml'), '--end', '1800', '--seed','42','--time-to-teleport','-1','--no-step-log','true','--tripinfo-output',str(out/'trips.xml')], stdout=log, stderr=subprocess.STDOUT, check=True)
     trips = ET.parse(out/'trips.xml').getroot().findall('tripinfo')
     if {t.get('id') for t in trips} != {v.get('id') for v in routes}: raise ValueError('Incomplete probes')
-    checks.update(completed_probes=len(trips), lane_attributes_and_connections_unchanged=True)
+    checks.update(completed_probes=len(trips), lane_attributes_and_connections_unchanged=True,
+                  expected_lane_matches=lane_checks)
     (out/'validation.json').write_text(json.dumps(checks, indent=2))
     center = net.convertLonLat2XY(*profile['center']); lanes = []
     for e in root.findall('edge'):

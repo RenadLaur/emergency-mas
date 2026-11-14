@@ -1,0 +1,17 @@
+{"time_seconds": 15.0, "event": "incident_activated", "incident_id": "intersection_fire_injury", "closed_lanes": ["west_in_0"]}
+{"time_seconds": 16.0, "event": "incident_report_sent", "message_id": "message_0000", "will_deliver_at_seconds": 18.0}
+{"time_seconds": 18.0, "event": "message_received", "message_id": "message_0000", "kind": "incident_report", "sender": "roadside_sensor", "recipient": "dispatcher"}
+{"time_seconds": 18.0, "event": "dispatcher_response_plan", "incident_class": "rescue_hazard", "police_units": 1, "ambulance_units": 1, "fire_rescue_units": 1, "reasons": ["scene_safety_and_traffic_management", "suspected_injured", "fire_or_smoke", "road_blockage"]}
+{"time_seconds": 18.0, "event": "dispatcher_assigned", "call_id": "intersection_fire_injury__police_00", "unit_id": "police_00", "unit_type": "police", "vehicle_id": "police_00__intersection_fire_injury__police_00"}
+{"time_seconds": 18.0, "event": "dispatcher_assigned", "call_id": "intersection_fire_injury__ambulance_00", "unit_id": "ambulance_00", "unit_type": "ambulance", "vehicle_id": "ambulance_00__intersection_fire_injury__ambulance_00"}
+{"time_seconds": 18.0, "event": "dispatcher_assigned", "call_id": "intersection_fire_injury__fire_rescue_00", "unit_id": "fire_rescue_00", "unit_type": "fire_rescue", "vehicle_id": "fire_rescue_00__intersection_fire_injury__fire_rescue_00"}
+{"time_seconds": 18.0, "event": "dispatcher_lane_bypass_command_sent", "message_id": "message_0001", "will_deliver_at_seconds": 19.0}
+{"time_seconds": 19.0, "event": "message_received", "message_id": "message_0001", "kind": "lane_bypass_command", "sender": "dispatcher", "recipient": "transit_ambulance"}
+{"time_seconds": 19.0, "event": "transit_ambulance_lane_bypass_applied"}
+{"time_seconds": 23.2, "event": "priority_requested"}
+{"time_seconds": 26.2, "event": "priority_granted"}
+{"time_seconds": 29.2, "event": "priority_restored"}
+{"time_seconds": 36.9, "event": "transit_ambulance_arrived"}
+{"time_seconds": 41.5, "event": "response_call_completed", "call_id": "intersection_fire_injury__police_00", "unit_id": "police_00", "vehicle_id": "police_00__intersection_fire_injury__police_00"}
+{"time_seconds": 51.0, "event": "response_call_completed", "call_id": "intersection_fire_injury__fire_rescue_00", "unit_id": "fire_rescue_00", "vehicle_id": "fire_rescue_00__intersection_fire_injury__fire_rescue_00"}
+{"time_seconds": 53.0, "event": "response_call_completed", "call_id": "intersection_fire_injury__ambulance_00", "unit_id": "ambulance_00", "vehicle_id": "ambulance_00__intersection_fire_injury__ambulance_00"}

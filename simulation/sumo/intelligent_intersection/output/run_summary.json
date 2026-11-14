@@ -1,0 +1,22 @@
+{
+  "seed": 42,
+  "priority_granted": true,
+  "priority_restored": true,
+  "ambulance_arrived": true,
+  "ambulance_arrival_time_seconds": 52.7,
+  "civilian_vehicles_observed": 62,
+  "civilians_in_emergency_detection_range": 7,
+  "yielding": {
+    "yield_detections": 7,
+    "yield_attempts": 3,
+    "yield_declined": 3,
+    "yield_impossible": 1,
+    "yield_actions_applied": 2,
+    "yield_actions_failed": 1
+  },
+  "ordinary_transport_max_wait_seconds": 377.6,
+  "safety": {
+    "near_misses": 0,
+    "minimum_ttc_seconds": 4.545083946418682
+  }
+}

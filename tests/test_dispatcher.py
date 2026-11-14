@@ -1,5 +1,5 @@
 from agents.dispatcher.dispatcher import (CallStatus, EmergencyCall, EmergencyUnit,
-                                          NearestFreeDispatcher, UnitStatus)
+                                          NearestFreeDispatcher, UnitStatus, UnitType)
 
 
 def route_provider(unit: EmergencyUnit, call: EmergencyCall):
@@ -35,3 +35,25 @@ def test_completion_returns_unit_to_available_at_incident() -> None:
     assert call.status is CallStatus.COMPLETED
     assert dispatcher.units["unit_a"].status is UnitStatus.AVAILABLE
     assert dispatcher.units["unit_a"].edge_id == "incident"
+
+
+def test_call_only_uses_a_matching_resource_type() -> None:
+    dispatcher = NearestFreeDispatcher([
+        EmergencyUnit("ambulance_00", "a", unit_type=UnitType.AMBULANCE),
+        EmergencyUnit("police_00", "b", unit_type=UnitType.POLICE),
+    ])
+    dispatcher.create_call(EmergencyCall("scene", 0, "incident", required_unit_type=UnitType.POLICE))
+
+    assignment = dispatcher.assign("scene", lambda unit, call: ((unit.edge_id, call.destination_edge_id), 1))
+
+    assert assignment is not None
+    assert assignment.unit_id == "police_00"
+    assert assignment.unit_type is UnitType.POLICE
+
+
+def test_call_stays_pending_when_its_resource_type_is_unavailable() -> None:
+    dispatcher = NearestFreeDispatcher([EmergencyUnit("ambulance_00", "a")])
+    dispatcher.create_call(EmergencyCall("scene", 0, "incident", required_unit_type=UnitType.FIRE_RESCUE))
+
+    assert dispatcher.assign("scene", lambda unit, call: ((unit.edge_id, call.destination_edge_id), 1)) is None
+    assert dispatcher.calls["scene"].status is CallStatus.PENDING

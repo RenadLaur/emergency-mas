@@ -47,6 +47,11 @@ simulation/sumo/rescue_lane/output/*
 !simulation/sumo/rescue_lane/output/.gitkeep
 simulation/sumo/traffic_light_priority/output/*
 !simulation/sumo/traffic_light_priority/output/.gitkeep
+simulation/sumo/mangilik_corridor/output/*
+!simulation/sumo/mangilik_corridor/output/.gitkeep
+simulation/sumo/incident_rerouting/incident_rerouting.net.xml
+simulation/sumo/incident_rerouting/output/*
+!simulation/sumo/incident_rerouting/output/.gitkeep
 *.sumo.log
 *.tripinfo.xml
 *.fcd.xml

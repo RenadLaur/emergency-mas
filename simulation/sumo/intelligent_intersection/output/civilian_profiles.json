@@ -1,0 +1,44 @@
+{
+  "west_queue.10": {
+    "yield_probability": 0.5427,
+    "reaction_seconds": 0.518,
+    "aggressiveness": 0.8052,
+    "attention": 0.7727
+  },
+  "west_queue.11": {
+    "yield_probability": 0.7691,
+    "reaction_seconds": 1.92,
+    "aggressiveness": 0.6733,
+    "attention": 0.5642
+  },
+  "west_queue.12": {
+    "yield_probability": 0.752,
+    "reaction_seconds": 1.546,
+    "aggressiveness": 0.7177,
+    "attention": 0.805
+  },
+  "west_queue.13": {
+    "yield_probability": 0.7126,
+    "reaction_seconds": 1.244,
+    "aggressiveness": 0.1353,
+    "attention": 0.8543
+  },
+  "west_queue.8": {
+    "yield_probability": 0.8598,
+    "reaction_seconds": 1.311,
+    "aggressiveness": 0.0901,
+    "attention": 0.9015
+  },
+  "west_queue.9": {
+    "yield_probability": 0.7559,
+    "reaction_seconds": 0.812,
+    "aggressiveness": 0.6875,
+    "attention": 0.5456
+  },
+  "west_queue.14": {
+    "yield_probability": 0.5622,
+    "reaction_seconds": 1.295,
+    "aggressiveness": 0.7788,
+    "attention": 0.5914
+  }
+}

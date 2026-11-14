@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1"
+           accel="2.6" decel="5.0" sigma="0.0" length="6.0" maxSpeed="16.67"/>
+    <route id="upper_route" edges="start upper_in upper_out finish"/>
+    <vehicle id="ambulance_0" type="ambulance" route="upper_route" depart="0"
+             departLane="best" departSpeed="max"/>
+</routes>

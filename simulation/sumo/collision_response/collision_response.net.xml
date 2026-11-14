@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-11T12:49:53.000177+05:00 by Eclipse SUMO netconvert 1.28.0
+<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <node-files value="/Users/lorenzo/Documents/Codex/2026-10-14/new-chat/emergency-mas/simulation/sumo/collision_response/collision_response.nod.xml"/>
+        <edge-files value="/Users/lorenzo/Documents/Codex/2026-10-14/new-chat/emergency-mas/simulation/sumo/collision_response/collision_response.edg.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/Users/lorenzo/Documents/Codex/2026-10-14/new-chat/emergency-mas/simulation/sumo/collision_response/collision_response.net.xml"/>
+    </output>
+
+</netconvertConfiguration>
+-->
+
+<net version="1.20" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="0.00,0.00,800.00,0.00" origBoundary="0.00,0.00,800.00,0.00" projParameter="!"/>
+
+    <edge id=":midpoint_0" function="internal">
+        <lane id=":midpoint_0_0" index="0" speed="27.78" length="0.10" shape="400.00,-1.60 400.00,-1.60"/>
+    </edge>
+
+    <edge id="approach" from="origin" to="midpoint" priority="-1">
+        <lane id="approach_0" index="0" speed="27.78" length="400.00" shape="0.00,-1.60 400.00,-1.60"/>
+    </edge>
+    <edge id="exit" from="midpoint" to="destination" priority="-1">
+        <lane id="exit_0" index="0" speed="27.78" length="400.00" shape="400.00,-1.60 800.00,-1.60"/>
+    </edge>
+
+    <junction id="destination" type="dead_end" x="800.00" y="0.00" incLanes="exit_0" intLanes="" shape="800.00,-3.20 800.00,0.00"/>
+    <junction id="midpoint" type="priority" x="400.00" y="0.00" incLanes="approach_0" intLanes=":midpoint_0_0" shape="400.00,0.00 400.00,-3.20 400.00,0.00">
+        <request index="0" response="0" foes="0" cont="0"/>
+    </junction>
+    <junction id="origin" type="dead_end" x="0.00" y="0.00" incLanes="" intLanes="" shape="0.00,0.00 0.00,-3.20"/>
+
+    <connection from="approach" to="exit" fromLane="0" toLane="0" via=":midpoint_0_0" dir="s" state="M"/>
+
+    <connection from=":midpoint_0" to="exit" fromLane="0" toLane="0" dir="s" state="M"/>
+
+</net>

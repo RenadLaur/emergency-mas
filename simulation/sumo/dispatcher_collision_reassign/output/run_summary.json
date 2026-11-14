@@ -1,0 +1,50 @@
+{
+  "physical_collision_detected": true,
+  "first_vehicle_id": "ambulance_00__collision_call__attempt1",
+  "replacement_vehicle_id": "ambulance_01__collision_call__attempt2",
+  "call_status": "completed",
+  "attempts": 2,
+  "completed_time_seconds": 55.1,
+  "safety": {
+    "near_misses": 1,
+    "minimum_ttc_seconds": 0.055998807154649055
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "event": "dispatcher_assigned",
+      "unit_id": "ambulance_00",
+      "vehicle_id": "ambulance_00__collision_call__attempt1",
+      "attempt": 1
+    },
+    {
+      "time_seconds": 7.1,
+      "event": "physical_collision",
+      "vehicle_ids": [
+        "ambulance_00__collision_call__attempt1",
+        "stalled_vehicle"
+      ]
+    },
+    {
+      "time_seconds": 7.1,
+      "event": "emergency_vehicle_unavailable",
+      "unit_id": "ambulance_00",
+      "vehicle_id": "ambulance_00__collision_call__attempt1",
+      "reason": "physical_collision"
+    },
+    {
+      "time_seconds": 7.1,
+      "event": "dispatcher_assigned",
+      "unit_id": "ambulance_01",
+      "vehicle_id": "ambulance_01__collision_call__attempt2",
+      "attempt": 2
+    },
+    {
+      "time_seconds": 55.1,
+      "event": "call_completed",
+      "call_id": "collision_call",
+      "unit_id": "ambulance_01",
+      "vehicle_id": "ambulance_01__collision_call__attempt2"
+    }
+  ]
+}

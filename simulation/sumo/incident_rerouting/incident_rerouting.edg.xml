@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges>
+    <edge id="start" from="origin" to="split" speed="13.89" numLanes="1"/>
+    <edge id="upper_in" from="split" to="upper" speed="13.89" numLanes="1"/>
+    <edge id="upper_out" from="upper" to="merge" speed="13.89" numLanes="1"/>
+    <edge id="lower_in" from="split" to="lower" speed="13.89" numLanes="1"/>
+    <edge id="lower_out" from="lower" to="merge" speed="13.89" numLanes="1"/>
+    <edge id="finish" from="merge" to="destination" speed="13.89" numLanes="1"/>
+</edges>

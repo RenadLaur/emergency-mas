@@ -1,0 +1,14 @@
+{"time_seconds": 29.8, "event": "yield_declined", "vehicle_id": "west_queue.10", "emergency_id": "ambulance_0", "distance_meters": 40.22, "physically_possible": true, "effective_probability": 0.3012}
+{"time_seconds": 29.8, "event": "yield_declined", "vehicle_id": "west_queue.11", "emergency_id": "ambulance_0", "distance_meters": 28.7, "physically_possible": true, "effective_probability": 0.3317}
+{"time_seconds": 29.8, "event": "yield_scheduled", "vehicle_id": "west_queue.12", "emergency_id": "ambulance_0", "distance_meters": 17.83, "physically_possible": true, "due_time_seconds": 31.346}
+{"time_seconds": 29.8, "event": "yield_scheduled", "vehicle_id": "west_queue.13", "emergency_id": "ambulance_0", "distance_meters": 7.53, "physically_possible": true, "due_time_seconds": 31.044}
+{"time_seconds": 29.8, "event": "yield_scheduled", "vehicle_id": "west_queue.8", "emergency_id": "ambulance_0", "distance_meters": 65.43, "physically_possible": true, "due_time_seconds": 31.111}
+{"time_seconds": 29.8, "event": "yield_declined", "vehicle_id": "west_queue.9", "emergency_id": "ambulance_0", "distance_meters": 52.45, "physically_possible": true, "effective_probability": 0.3132}
+{"time_seconds": 31.1, "event": "yield_failed", "vehicle_id": "west_queue.13", "emergency_id": "ambulance_0"}
+{"time_seconds": 31.2, "event": "yield_applied", "vehicle_id": "west_queue.8", "emergency_id": "ambulance_0"}
+{"time_seconds": 31.4, "event": "yield_applied", "vehicle_id": "west_queue.12", "emergency_id": "ambulance_0"}
+{"time_seconds": 36.6, "event": "yield_impossible", "vehicle_id": "west_queue.14", "emergency_id": "ambulance_0", "distance_meters": 0.01, "physically_possible": false}
+{"time_seconds": 37.1, "event": "priority_requested", "all_red_state": "rrrrrrrrrrrrrrrrrrrr"}
+{"time_seconds": 40.1, "event": "priority_granted", "signal_state": "rrrrrrrrrrrrrrrGGGGG"}
+{"time_seconds": 44.4, "event": "priority_restored", "program_id": "0"}
+{"time_seconds": 52.7, "event": "ambulance_arrived"}

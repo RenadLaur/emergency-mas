@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes>
+    <node id="origin" x="0" y="0" type="priority"/>
+    <node id="split" x="100" y="0" type="priority"/>
+    <node id="upper" x="220" y="80" type="priority"/>
+    <node id="lower" x="220" y="-80" type="priority"/>
+    <node id="merge" x="340" y="0" type="priority"/>
+    <node id="destination" x="450" y="0" type="priority"/>
+</nodes>

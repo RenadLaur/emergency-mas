@@ -1,0 +1,23 @@
+{
+  "physical_collision_detected": true,
+  "collision_time_seconds": 7.4,
+  "colliding_vehicles": [
+    "stalled_vehicle",
+    "unsafe_vehicle"
+  ],
+  "impact_speed_mps": 25.0,
+  "safety": {
+    "near_misses": 1,
+    "minimum_ttc_seconds": 0.09999880715464883
+  },
+  "response_plan": {
+    "incident_class": "minor",
+    "police_units": 1,
+    "ambulance_units": 0,
+    "fire_rescue_units": 0,
+    "reasons": [
+      "scene_safety_and_traffic_management",
+      "road_blockage"
+    ]
+  }
+}

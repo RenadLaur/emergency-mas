@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emergency MAS — диспетчерская</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./interactions.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">✦</span><span>EMERGENCY <b>MAS</b></span></div>
+        <div class="scenario"><span class="live-dot"></span> Сценарий: ДТП · демонстрация модели</div>
+        <div class="clock" id="clock">08:43:17</div>
+      </header>
+
+      <section class="workspace">
+        <aside class="sidebar">
+          <p class="eyebrow">ОПЕРАЦИОННЫЙ ЦЕНТР</p>
+          <h1>Астана<br /><span>реагирование</span></h1>
+          <div class="status-card">
+            <div><span class="status-icon">!</span><span><b>Активный инцидент</b><small>ул. Сарайшык · съезд Мангилик Ел</small></span></div>
+            <span class="severity">СРЕДНИЙ</span>
+          </div>
+
+          <div class="stats">
+            <article><span>В пути</span><strong id="enRoute">03</strong><small>ед. техники</small></article>
+            <article><span>Ожидание</span><strong>12</strong><small>обычных авто</small></article>
+            <article><span>Средний ETA</span><strong id="eta">06:40</strong><small>до места</small></article>
+            <article><span>Безопасность</span><strong class="safe">92%</strong><small>оценка плана</small></article>
+          </div>
+
+          <div class="panel-title"><span>Ресурсы</span><small>онлайн</small></div>
+          <div class="resources">
+            <button class="resource selected" data-unit="ambulance"><i class="unit ambulance">✚</i><span><b>Скорая 03-21</b><small>Маршрут B · приоритет TLS</small></span><em>06:40</em></button>
+            <button class="resource" data-unit="police"><i class="unit police">◆</i><span><b>Полиция 102-07</b><small>Маршрут A · ограждение</small></span><em>04:10</em></button>
+            <button class="resource" data-unit="fire"><i class="unit fire">△</i><span><b>Пожарная 101-04</b><small>Резерв · не назначена</small></span><em>10:20</em></button>
+          </div>
+          <p class="model-note">Учебный экран: геометрия и статусы — визуализация сценария; решения принимаются симулятором SUMO/Python.</p>
+        </aside>
+
+        <section class="map-frame" aria-label="Интерактивная карта сценария">
+          <div class="map-controls">
+            <button id="zoomIn" aria-label="Приблизить">+</button><button id="zoomOut" aria-label="Отдалить">−</button>
+            <button id="layers" aria-pressed="true" class="layers">≋ <span>Объекты</span></button>
+          </div>
+          <div class="map-legend"><span><i class="legend ambulance"></i>скорая</span><span><i class="legend police"></i>полиция</span><span><i class="legend incident"></i>ДТП</span></div>
+          <svg id="cityMap" viewBox="0 0 1200 760" role="img" aria-label="Схема участка Астаны у Мангилик Ел и Сарайшык">
+            <defs>
+              <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="#dae4ea" stroke-width="1" opacity=".42"/></pattern>
+              <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".23"/></filter>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#43d2c3"/></marker>
+            </defs>
+            <rect class="land" width="1200" height="760"/><rect class="map-grid" width="1200" height="760" fill="url(#grid)"/>
+            <path class="river" d="M-30 480 C150 398 254 565 418 502 S668 410 777 488 S1046 544 1235 424"/>
+            <path class="river-line" d="M-30 480 C150 398 254 565 418 502 S668 410 777 488 S1046 544 1235 424"/>
+            <path class="park" d="M0 20 H360 V150 L278 221 84 180 0 220z"/><path class="park" d="M914 190 L1200 145 V470 L1080 492 928 399z"/>
+            <g class="buildings">
+              <path d="M85 266h90v62H85zM201 246h121v90H201zM352 274h78v53h-78zM113 351h104v62H113zM252 364h118v61H252zM400 345h65v54h-65z"/>
+              <path d="M768 65h128v80H768zM925 60h90v73h-90zM1047 69h93v96h-93zM742 176h106v59H742zM875 178h154v60H875z"/>
+              <path d="M535 573h90v62h-90zM654 595h142v66H654zM825 548h98v70h-98zM952 548h111v77H952zM1080 535h79v67h-79z"/>
+            </g>
+            <g class="minor-roads"><path d="M48 282L552 220M46 368L550 308M600 80L590 685M721 75L710 351M744 574L1145 685M810 250L1160 384M184 226L232 530"/></g>
+            <g class="roads">
+              <path class="road edge" d="M-38 603 C170 539 304 609 468 540 S743 392 920 444 S1103 457 1242 326"/>
+              <path class="road inner" d="M-38 603 C170 539 304 609 468 540 S743 392 920 444 S1103 457 1242 326"/>
+              <path class="road edge" d="M535 -30 C510 139 553 263 584 375 S582 593 535 792"/><path class="road inner" d="M535 -30 C510 139 553 263 584 375 S582 593 535 792"/>
+              <path class="road edge" d="M792 -30 C756 121 758 221 729 322 S625 506 633 790"/><path class="road inner" d="M792 -30 C756 121 758 221 729 322 S625 506 633 790"/>
+              <path class="ramp edge" d="M435 549 C510 493 543 437 548 377"/><path class="ramp inner" d="M435 549 C510 493 543 437 548 377"/>
+              <path class="ramp edge" d="M738 325 C688 304 647 310 600 354"/><path class="ramp inner" d="M738 325 C688 304 647 310 600 354"/>
+              <path class="road-centre" d="M-38 603 C170 539 304 609 468 540 S743 392 920 444 S1103 457 1242 326"/>
+              <path class="road-centre" d="M535 -30 C510 139 553 263 584 375 S582 593 535 792"/><path class="road-centre" d="M792 -30 C756 121 758 221 729 322 S625 506 633 790"/>
+            </g>
+            <g class="labels"><text x="701" y="128">проспект Мангилик Ел</text><text x="238" y="588">улица Сарайшык</text><text x="977" y="290">парк Жетысу</text><text x="662" y="650">левый берег · Есиль</text></g>
+            <g class="signals"><g transform="translate(572 362)"><circle/><path d="M-1-5v10M-5-1h10"/></g><g transform="translate(731 329)"><circle/><path d="M-1-5v10M-5-1h10"/></g></g>
+            <path id="ambulancePath" d="M276 573 C360 590 426 558 468 540 S547 452 570 393" fill="none" stroke="#43d2c3" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrow)"/>
+            <g id="ambulanceMarker" filter="url(#shadow)"><circle r="19" class="vehicle-bg ambulance"/><text y="7" text-anchor="middle">✚</text></g>
+            <g id="policeMarker" filter="url(#shadow)"><circle r="17" class="vehicle-bg police"/><text y="6" text-anchor="middle">◆</text></g>
+            <g class="incident-marker" transform="translate(570 384)" filter="url(#shadow)"><circle r="24"/><path d="M0-11L10 8H-10z"/><text y="7" text-anchor="middle">!</text></g>
+            <g class="incident-label" transform="translate(602 358)"><rect width="167" height="55" rx="9"/><text x="14" y="22">ДТП · подтверждено</text><text x="14" y="41">2 авто · 0 пострадавших</text></g>
+          </svg>
+          <div class="map-title"><span>АСТАНА · ЛЕВЫЙ БЕРЕГ</span><small>Слой: транспортная модель · seed 42</small></div>
+        </section>
+
+        <aside class="rightbar">
+          <div class="incident-head"><div><p class="eyebrow">ИНЦИДЕНТ #A-0248</p><h2>Столкновение</h2></div><span class="tag">T+02:17</span></div>
+          <dl class="facts"><div><dt>Локация</dt><dd>Сарайшык / Мангилик Ел</dd></div><div><dt>Тип</dt><dd>Боковое столкновение</dd></div><div><dt>Риск</dt><dd><span class="risk-dot"></span>контролируемый</dd></div></dl>
+          <div class="panel-title"><span>Ход операции</span><small id="progressText">шаг 1 / 5</small></div>
+          <ol class="timeline" id="timeline">
+            <li class="active"><time>08:41:00</time><span><b>ДТП обнаружено</b><small>датчик / модель конфликта</small></span></li>
+            <li><time>08:41:45</time><span><b>Подтверждение диспетчером</b><small>назначение 102-07</small></span></li>
+            <li><time>08:42:10</time><span><b>Маршрут скорой построен</b><small>объезд закрытой полосы</small></span></li>
+            <li><time>08:42:15</time><span><b>Запрошен зелёный коридор</b><small>светофоры 14, 19</small></span></li>
+            <li><time>08:43:17</time><span><b>Экипажи в пути</b><small>ETA пересчитан</small></span></li>
+          </ol>
+          <div class="safety"><div><span>Индекс безопасности</span><b>92 / 100</b></div><div class="meter"><i></i></div><small>Безопасный объезд выбран вместо прямого участка с конфликтом.</small></div>
+        </aside>
+      </section>
+      <footer class="playbar"><button id="play" class="play">▶ <span>Запустить сценарий</span></button><button id="reset" class="reset">↺</button><div class="scrub"><div class="track"><i id="progress"></i></div><span id="seconds">00:00 / 06:40</span></div><span class="footer-note">Учебный MVP · не навигационный сервис</span></footer>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

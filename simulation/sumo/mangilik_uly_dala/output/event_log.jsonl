@@ -1,0 +1,4 @@
+{"time_seconds": 35.1, "event": "priority_requested"}
+{"time_seconds": 38.1, "event": "priority_granted", "signal_indices": [10, 11, 12, 13]}
+{"time_seconds": 40.8, "event": "priority_restored"}
+{"time_seconds": 41.9, "event": "ambulance_arrived"}

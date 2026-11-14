@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="civilian" vClass="passenger" length="5" accel="2.6" decel="4.5" emergencyDecel="9"/>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1"
+           length="6" accel="2.6" decel="5.0" maxSpeed="16.67"/>
+    <route id="straight" edges="approach exit"/>
+    <vehicle id="stalled_vehicle" type="civilian" route="straight" depart="0" departPos="180" departSpeed="0">
+        <stop lane="approach_0" endPos="185" duration="100"/>
+    </vehicle>
+</routes>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Presentation profile. The built-in "real world" scheme uses car silhouettes
+  instead of debug triangles and hides most internal connector geometry.
+  Keep debugging profiles separate: they are useful for validating turns.
+-->
+<viewsettings>
+    <scheme name="real world"/>
+    <delay value="100"/>
+</viewsettings>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emergency MAS — Иманова · карта слоёв</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header><a href="http://127.0.0.1:8874/">← Диспетчерская</a><div class="brand">EMERGENCY <b>MAS</b><small>КАРТА СЛОЁВ УЗЛА</small></div><span class="source">Иманова / Беласар · локальный прототип</span></header>
+      <section class="layout">
+        <aside class="left">
+          <p class="eyebrow">СЦЕНА #IM-01</p><h1>Мост<br><span>Беласар</span></h1>
+          <div class="status"><i></i><span><b>Топология проверяется</b><small>Физическая сеть не меняется</small></span></div>
+          <div class="layers-title">Слои сцены</div>
+          <button class="layer active" data-layer="upper"><span class="swatch upper"></span><span><b>Верхний мост</b><small>2 × 2 полосы · vehicle</small></span><em>z +5</em></button>
+          <button class="layer active" data-layer="lower"><span class="swatch lower"></span><span><b>Нижний проезд</b><small>service · covered · layer −1</small></span><em>z −2</em></button>
+          <button class="layer active" data-layer="context"><span class="swatch context"></span><span><b>Пешеходная зона</b><small>визуальный контекст</small></span><em>z 0</em></button>
+          <div class="note">Высоты условные и показаны только для осмотра сцены. Они не применяются к физике SUMO, пока не определён полный профиль подъездов.</div>
+        </aside>
+        <section class="viewport"><canvas id="scene" aria-label="Интерактивная карта сверху моста Беласар"></canvas><div class="canvas-hud"><span>ВИД СВЕРХУ · ПЕРЕТАЩИВАЙ ДЛЯ ПОВОРОТА</span><span id="mode">СЛЕЖЕНИЕ: СКОРАЯ</span></div><div class="legend"><span><i class="ambulance"></i>скорая</span><span><i class="civilian"></i>обычный транспорт</span><span><i class="hitbox"></i>hitbox: только свой уровень</span></div></section>
+        <aside class="right">
+          <p class="eyebrow">ОБЪЕКТЫ SUMO</p>
+          <dl><div><dt>Мост, направление 1</dt><dd>1537667048</dd></div><div><dt>Мост, направление 2</dt><dd>846023745</dd></div><div><dt>Полос на проезд</dt><dd>2</dd></div><div><dt>Нижний сервис</dt><dd>622653202</dd></div></dl>
+          <div class="controls"><p class="eyebrow">УПРАВЛЕНИЕ</p><button id="follow" class="selected">⌖ Следить за скорой</button><button id="overview">◈ Общий вид</button><label class="toggle"><input id="hitbox" type="checkbox" checked><span></span>Показывать hitbox</label><label class="toggle"><input id="animate" type="checkbox" checked><span></span>Анимация движения</label></div>
+          <div class="safety"><b>Ограничение модели</b><p>Нижний проезд отображён отдельно: машина плавно исчезает под настилом, а hitbox не сравнивается с верхним полотном. Прямое соединение не создаётся без подтверждённого манёвра.</p></div>
+        </aside>
+      </section>
+      <footer><span>Суммарная карта Астаны будет использовать тот же формат слоёв.</span><span>seed 42 · демонстрационный кадр</span></footer>
+    </main><script src="./app.js"></script>
+  </body>
+</html>

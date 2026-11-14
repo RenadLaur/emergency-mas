@@ -1,0 +1,30 @@
+{
+  "incident_activated": true,
+  "incident_to_dispatcher_seconds": 3.0,
+  "dispatcher_to_transit_ambulance_seconds": 1.0,
+  "response_plan": {
+    "incident_class": "rescue_hazard",
+    "police_units": 1,
+    "ambulance_units": 1,
+    "fire_rescue_units": 1,
+    "reasons": [
+      "scene_safety_and_traffic_management",
+      "suspected_injured",
+      "fire_or_smoke",
+      "road_blockage"
+    ]
+  },
+  "response_calls_dispatched": 3,
+  "response_calls_completed": 3,
+  "emergency_bypass_corridor_enabled": true,
+  "emergency_bypass_corridor_lane": 2,
+  "transit_ambulance_lane_bypass_applied": true,
+  "transit_ambulance_arrived": true,
+  "transit_ambulance_arrival_time_seconds": 36.9,
+  "priority_granted": true,
+  "priority_restored": true,
+  "safety": {
+    "near_misses": 0,
+    "minimum_ttc_seconds": null
+  }
+}
