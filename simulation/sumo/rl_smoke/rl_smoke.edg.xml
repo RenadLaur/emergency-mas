@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges>
+    <edge id="depot_0_in" from="depot_0" to="hub" speed="13.89" numLanes="1"/>
+    <edge id="depot_1_in" from="depot_1" to="hub" speed="13.89" numLanes="1"/>
+    <edge id="depot_2_in" from="depot_2" to="hub" speed="13.89" numLanes="1"/>
+    <edge id="depot_3_in" from="depot_3" to="hub" speed="13.89" numLanes="1"/>
+    <edge id="hub_to_split" from="hub" to="split" speed="13.89" numLanes="1"/>
+    <edge id="upper_in" from="split" to="upper" speed="13.89" numLanes="1"/>
+    <edge id="upper_out" from="upper" to="merge" speed="13.89" numLanes="1"/>
+    <edge id="center_in" from="split" to="center" speed="13.89" numLanes="1"/>
+    <edge id="center_out" from="center" to="merge" speed="13.89" numLanes="1"/>
+    <edge id="lower_in" from="split" to="lower" speed="13.89" numLanes="1"/>
+    <edge id="lower_out" from="lower" to="merge" speed="13.89" numLanes="1"/>
+    <edge id="finish" from="merge" to="destination" speed="13.89" numLanes="1"/>
+</edges>

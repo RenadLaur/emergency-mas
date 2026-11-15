@@ -35,10 +35,15 @@ NETWORK = (
 )
 ROUTES = SCENARIO_DIR / "mangilik_corridor.rou.xml"
 AMBULANCE_ID = "ambulance_0"
+SCENARIO_VERSION = 2
 EXPECTED_CIVILIANS = 100
 WARMUP_SECONDS = 120.0
 DETECTION_RANGE_METERS = 75.0
 PRIORITY_REQUEST_RANGE_METERS = 110.0
+MIN_LANE_CHANGE_GAP_METERS = 12.0
+MIN_LANE_CHANGE_TTC_SECONDS = 4.0
+LANE_CHANGE_HEADWAY_SECONDS = 1.2
+JUNCTION_CLEARANCE_METERS = 25.0
 MODES = ("normal", "priority", "yielding", "assisted")
 SYGANAK_LOWER_EDGES = {"762778578#5", "688297712#12"}
 SARAYSHYK_VICINITY_EDGES = {"735041697#0", "165816979#3"}
@@ -52,25 +57,72 @@ class _ActivePriority:
     stage_started_at: float
 
 
+def _gap_is_safe(gap: float, closing_speed: float, reference_speed: float) -> bool:
+    """Check both a speed-dependent headway and TTC for one neighbouring vehicle."""
+    required_gap = max(
+        MIN_LANE_CHANGE_GAP_METERS,
+        reference_speed * LANE_CHANGE_HEADWAY_SECONDS,
+    )
+    if gap < required_gap:
+        return False
+    return closing_speed <= 0.0 or gap / closing_speed >= MIN_LANE_CHANGE_TTC_SECONDS
+
+
+def _target_lane_is_safe(vehicle_id: str, lane_id: str, position: float) -> bool:
+    """Validate front and rear gaps on a candidate lane at the current simulation step."""
+    lane_length = traci.lane.getLength(lane_id)
+    if (
+        position < JUNCTION_CLEARANCE_METERS
+        or lane_length - position < JUNCTION_CLEARANCE_METERS
+    ):
+        return False
+
+    ego_speed = traci.vehicle.getSpeed(vehicle_id)
+    ego_length = traci.vehicle.getLength(vehicle_id)
+    nearest_front: tuple[float, float] | None = None
+    nearest_rear: tuple[float, float] | None = None
+    for other_id in traci.lane.getLastStepVehicleIDs(lane_id):
+        if other_id == vehicle_id:
+            continue
+        other_position = traci.vehicle.getLanePosition(other_id)
+        other_speed = traci.vehicle.getSpeed(other_id)
+        if other_position >= position:
+            gap = other_position - traci.vehicle.getLength(other_id) - position
+            if nearest_front is None or gap < nearest_front[0]:
+                nearest_front = (gap, other_speed)
+        else:
+            gap = position - ego_length - other_position
+            if nearest_rear is None or gap < nearest_rear[0]:
+                nearest_rear = (gap, other_speed)
+
+    if nearest_front is not None:
+        front_gap, front_speed = nearest_front
+        if not _gap_is_safe(front_gap, ego_speed - front_speed, ego_speed):
+            return False
+    if nearest_rear is not None:
+        rear_gap, rear_speed = nearest_rear
+        if not _gap_is_safe(rear_gap, rear_speed - ego_speed, rear_speed):
+            return False
+    return True
+
+
 def _safe_target_lane(vehicle_id: str) -> int | None:
-    """Find a free neighbouring lane on the current directed edge."""
+    """Find a safe adjacent lane, preferring a move to the right."""
     edge_id = traci.vehicle.getRoadID(vehicle_id)
     if not edge_id or edge_id.startswith(":"):
         return None
     current_lane = traci.vehicle.getLaneIndex(vehicle_id)
     position = traci.vehicle.getLanePosition(vehicle_id)
-    for target_lane_index in range(traci.edge.getLaneNumber(edge_id)):
-        if target_lane_index == current_lane:
+    lane_count = traci.edge.getLaneNumber(edge_id)
+    candidates = (current_lane - 1, current_lane + 1)
+    for target_lane_index in candidates:
+        if not 0 <= target_lane_index < lane_count:
             continue
         lane_id = f"{edge_id}_{target_lane_index}"
-        if "passenger" not in traci.lane.getAllowed(lane_id) and traci.lane.getAllowed(lane_id):
+        allowed = traci.lane.getAllowed(lane_id)
+        if allowed and "passenger" not in allowed:
             continue
-        neighbours = traci.lane.getLastStepVehicleIDs(lane_id)
-        if all(
-            other_id == vehicle_id
-            or abs(traci.vehicle.getLanePosition(other_id) - position) >= 15.0
-            for other_id in neighbours
-        ):
+        if _target_lane_is_safe(vehicle_id, lane_id, position):
             return target_lane_index
     return None
 
@@ -466,20 +518,26 @@ def run_scenario(
             if yielding_enabled:
                 for action in yielding.due_actions(time):
                     applied = False
+                    failure_reason = "vehicle_no_longer_active"
                     if action.civilian_id in active:
                         target_lane = _safe_target_lane(action.civilian_id)
                         if target_lane is not None:
                             try:
                                 traci.vehicle.changeLane(action.civilian_id, target_lane, 6.0)
                                 applied = True
+                                failure_reason = ""
                             except traci.TraCIException:
                                 applied = False
+                                failure_reason = "sumo_rejected_lane_change"
+                        else:
+                            failure_reason = "unsafe_gap_or_junction_proximity"
                     yielding.record_action(applied)
                     events.append({
                         "time_seconds": time,
                         "event": "yield_applied" if applied else "yield_failed",
                         "vehicle_id": action.civilian_id,
                         "emergency_id": action.emergency_id,
+                        **({"failure_reason": failure_reason} if not applied else {}),
                     })
             if AMBULANCE_ID in arrived:
                 ambulance_arrival = time
@@ -505,6 +563,7 @@ def run_scenario(
         ),
     })
     result: dict[str, object] = {
+        "scenario_version": SCENARIO_VERSION,
         "seed": seed,
         "mode": mode,
         "warmup_seconds": WARMUP_SECONDS,
@@ -524,6 +583,14 @@ def run_scenario(
             "program_resets": 0,
         },
         "yielding": yielding.counts,
+        "yielding_safety_policy": {
+            "adjacent_lanes_only": True,
+            "right_lane_preferred": True,
+            "minimum_gap_meters": MIN_LANE_CHANGE_GAP_METERS,
+            "minimum_ttc_seconds": MIN_LANE_CHANGE_TTC_SECONDS,
+            "headway_seconds": LANE_CHANGE_HEADWAY_SECONDS,
+            "junction_clearance_meters": JUNCTION_CLEARANCE_METERS,
+        },
         "ordinary_transport": {
             "mean_travel_time_seconds": round(statistics.fmean(civilian_travel_times), 3),
             "p95_travel_time_seconds": round(_p95(civilian_travel_times), 3),
@@ -615,7 +682,8 @@ def assemble_comparison(
             raise FileNotFoundError(f"Missing completed mode summary: {summary_path}")
         result = json.loads(summary_path.read_text(encoding="utf-8"))
         if (
-            result.get("mode") != mode
+            result.get("scenario_version") != SCENARIO_VERSION
+            or result.get("mode") != mode
             or result.get("seed") != seed
             or result.get("civilian_vehicles_expected") != civilian_count
         ):
@@ -635,7 +703,8 @@ def _completed_mode_summary(
     except (json.JSONDecodeError, OSError):
         return None
     if (
-        result.get("mode") != mode
+        result.get("scenario_version") != SCENARIO_VERSION
+        or result.get("mode") != mode
         or result.get("seed") != seed
         or result.get("civilian_vehicles_expected") != civilian_count
         or not result.get("ambulance_arrived")
@@ -770,6 +839,7 @@ def run_experiment_matrix(
             },
         }
     matrix = {
+        "scenario_version": SCENARIO_VERSION,
         "network": str(NETWORK),
         "route_template": str(ROUTES),
         "seeds": list(normalized_seeds),

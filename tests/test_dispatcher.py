@@ -57,3 +57,36 @@ def test_call_stays_pending_when_its_resource_type_is_unavailable() -> None:
 
     assert dispatcher.assign("scene", lambda unit, call: ((unit.edge_id, call.destination_edge_id), 1)) is None
     assert dispatcher.calls["scene"].status is CallStatus.PENDING
+
+
+def test_explicit_unit_assignment_keeps_dispatcher_invariants() -> None:
+    dispatcher = NearestFreeDispatcher([
+        EmergencyUnit("ambulance_00", "a"),
+        EmergencyUnit("ambulance_01", "b"),
+    ])
+    dispatcher.create_call(EmergencyCall("call", 0, "incident"))
+
+    assignment = dispatcher.assign_unit(
+        "call",
+        "ambulance_00",
+        lambda unit, call: ((unit.edge_id, call.destination_edge_id), 10),
+    )
+
+    assert assignment is not None
+    assert assignment.unit_id == "ambulance_00"
+    assert dispatcher.units["ambulance_00"].status is UnitStatus.BUSY
+    assert dispatcher.assign_unit(
+        "call",
+        "ambulance_01",
+        lambda unit, call: ((unit.edge_id, call.destination_edge_id), 5),
+    ) is None
+
+
+def test_explicit_unit_assignment_rejects_wrong_resource_type() -> None:
+    dispatcher = NearestFreeDispatcher([
+        EmergencyUnit("police_00", "a", unit_type=UnitType.POLICE),
+    ])
+    dispatcher.create_call(EmergencyCall("call", 0, "incident"))
+
+    assert dispatcher.assign_unit("call", "police_00", route_provider) is None
+    assert dispatcher.calls["call"].status is CallStatus.PENDING

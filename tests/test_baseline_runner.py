@@ -10,8 +10,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
-from baseline_runner import (VehicleSpec, build_dispatcher, build_vehicle_specs, choose_future_route_edge,
-                             choose_incident_access_edge, load_scenario, mean_or_zero, percentile, run_experiment,
+from baseline_runner import (VehicleSpec, astar_path, build_dispatcher, build_vehicle_specs,
+                             choose_future_route_edge, choose_incident_access_edge, load_scenario,
+                             mean_or_zero, passenger_component, percentile, run_experiment,
                              write_routes)  # noqa: E402
 
 
@@ -28,6 +29,57 @@ def test_scenario_rejects_unknown_tls_mode(tmp_path: Path) -> None:
     path = tmp_path / "scenario.json"; path.write_text(json.dumps(scenario))
     with pytest.raises(ValueError, match="tls_mode"):
         load_scenario(path)
+
+
+def test_scenario_accepts_astar_routing(tmp_path: Path) -> None:
+    scenario = {"network": "x", "seed": 42, "ordinary_vehicles": 1, "emergency_vehicles": 1,
+                "tls_mode": "normal", "routing_strategy": "astar"}
+    path = tmp_path / "scenario.json"; path.write_text(json.dumps(scenario))
+
+    assert load_scenario(path)["routing_strategy"] == "astar"
+
+
+def test_integrated_mvp_scenario_combines_required_inc13_models() -> None:
+    scenario = load_scenario(ROOT / "experiments" / "scenarios" / "astana_100_integrated_mvp.json")
+
+    assert scenario["dispatcher"]["enabled"] is True
+    assert scenario["incident"]["enabled"] is True
+    assert scenario["weather"]["condition"] == "rain"
+    assert scenario["emergency_driver"]["enabled"] is True
+    assert scenario["safety"]["enabled"] is True
+    assert scenario["emergency_tactics"]["mode"] == "blue_light"
+
+
+def test_astar_matches_dijkstra_shortest_cost_on_basic_network() -> None:
+    from simulation.sumo.basic.build_network import build_network
+    import sumolib
+    build_network()
+    net = sumolib.net.readNet(str(ROOT / "simulation" / "sumo" / "basic" / "basic.net.xml"))
+    edges = passenger_component(net)
+    expected_path = None
+    origin = destination = None
+    expected_cost = 0.0
+    for candidate_origin in edges:
+        for candidate_destination in edges:
+            if candidate_origin == candidate_destination:
+                continue
+            path, cost = net.getShortestPath(
+                candidate_origin, candidate_destination, vClass="passenger"
+            )
+            if path and len(path) >= 2:
+                origin, destination = candidate_origin, candidate_destination
+                expected_path, expected_cost = path, cost
+                break
+        if expected_path:
+            break
+
+    assert origin is not None and destination is not None
+    actual_path, actual_cost = astar_path(net, origin, destination, v_class="passenger")
+
+    assert actual_path is not None
+    assert actual_path[0] == origin
+    assert actual_path[-1] == destination
+    assert actual_cost == pytest.approx(expected_cost)
 
 
 def test_incident_requires_non_negative_delays_and_a_supported_target(tmp_path: Path) -> None:
@@ -50,6 +102,25 @@ def test_incident_target_skips_current_and_destination_edges() -> None:
     lanes = {"start": 1, "ahead": 2, "blocked": 1, "finish": 2}
     assert choose_future_route_edge(("start", "ahead", "blocked", "finish"), 0, lanes.get, 2) == "blocked"
     assert choose_future_route_edge(("start", "ahead", "finish"), 1, lanes.get, 1) is None
+
+
+def test_incident_target_requires_safe_lead_distance_and_an_alternate_route() -> None:
+    route = ("current", "too_close", "no_detour", "safe_target", "finish")
+    lanes = {edge_id: 1 for edge_id in route}
+    lengths = {"current": 20.0, "too_close": 100.0, "no_detour": 250.0,
+               "safe_target": 200.0, "finish": 50.0}
+
+    target = choose_future_route_edge(
+        route,
+        0,
+        lanes.get,
+        1,
+        edge_length_by_edge=lengths.get,
+        minimum_lead_distance_meters=500.0,
+        candidate_is_viable=lambda edge_id: edge_id == "safe_target",
+    )
+
+    assert target == "safe_target"
 
 
 def test_incident_response_uses_an_access_edge_before_the_closure() -> None:

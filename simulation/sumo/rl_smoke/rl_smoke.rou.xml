@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+    <vType id="civilian" vClass="passenger" accel="2.0" decel="4.5" sigma="0.3"
+           length="5.0" maxSpeed="13.89"/>
+    <vType id="ambulance" vClass="emergency" guiShape="emergency" color="1,1,1"
+           accel="2.6" decel="5.0" sigma="0.0" length="6.0" maxSpeed="16.67"/>
+
+    <route id="civilian_upper" edges="hub_to_split upper_in upper_out finish"/>
+    <route id="civilian_center" edges="hub_to_split center_in center_out finish"/>
+    <route id="civilian_lower" edges="hub_to_split lower_in lower_out finish"/>
+
+    <flow id="civilian_upper" type="civilian" route="civilian_upper"
+          begin="0" end="120" period="4" departLane="best" departSpeed="max"/>
+    <flow id="civilian_center" type="civilian" route="civilian_center"
+          begin="0" end="120" period="2" departLane="best" departSpeed="max"/>
+    <flow id="civilian_lower" type="civilian" route="civilian_lower"
+          begin="0" end="120" period="3" departLane="best" departSpeed="max"/>
+</routes>

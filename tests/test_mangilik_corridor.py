@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -29,6 +30,21 @@ def test_mangilik_corridor_runs_100_civilians_and_ambulance() -> None:
     assert result["civilian_vehicles_departed"] == 100
     assert result["civilian_vehicles_arrived"] == 100
     assert result["ambulance_arrived"] is True
+    assert result["scenario_version"] == corridor.SCENARIO_VERSION
+    assert result["yielding_safety_policy"]["minimum_ttc_seconds"] == 4.0
+
+
+def test_yielding_regression_seed42_demand160_has_no_collision(tmp_path: Path) -> None:
+    result = run_scenario(
+        mode="yielding",
+        seed=42,
+        civilian_count=160,
+        output_dir=tmp_path,
+    )
+
+    assert result["ambulance_arrived"] is True
+    assert result["civilian_vehicles_arrived"] == 160
+    assert result["safety"]["physical_collisions"] == 0
 
 
 def test_priority_call_path_cannot_set_a_fixed_phase_duration() -> None:
@@ -73,6 +89,46 @@ def test_green_guard_extends_a_short_phase_to_cover_eta(monkeypatch) -> None:
     assert changes == [("tls_0", 6.0)]
 
 
+def test_lane_change_gap_rejects_short_distance_and_low_ttc() -> None:
+    assert corridor._gap_is_safe(gap=11.9, closing_speed=0.0, reference_speed=5.0) is False
+    assert corridor._gap_is_safe(gap=20.0, closing_speed=6.0, reference_speed=10.0) is False
+
+
+def test_lane_change_gap_accepts_safe_headway_and_ttc() -> None:
+    assert corridor._gap_is_safe(gap=24.0, closing_speed=4.0, reference_speed=15.0) is True
+    assert corridor._gap_is_safe(gap=18.0, closing_speed=-1.0, reference_speed=10.0) is True
+
+
+def test_safe_target_lane_checks_only_adjacent_lanes_and_prefers_right(monkeypatch) -> None:
+    checked: list[str] = []
+    monkeypatch.setattr(corridor.traci.vehicle, "getRoadID", lambda _: "edge")
+    monkeypatch.setattr(corridor.traci.vehicle, "getLaneIndex", lambda _: 2)
+    monkeypatch.setattr(corridor.traci.vehicle, "getLanePosition", lambda _: 100.0)
+    monkeypatch.setattr(corridor.traci.edge, "getLaneNumber", lambda _: 4)
+    monkeypatch.setattr(corridor.traci.lane, "getAllowed", lambda _: ("passenger",))
+
+    def safe(_: str, lane_id: str, __: float) -> bool:
+        checked.append(lane_id)
+        return lane_id == "edge_1"
+
+    monkeypatch.setattr(corridor, "_target_lane_is_safe", safe)
+
+    assert corridor._safe_target_lane("civilian") == 1
+    assert checked == ["edge_1"]
+
+
+def test_target_lane_rejects_junction_proximity_without_inspecting_traffic(monkeypatch) -> None:
+    monkeypatch.setattr(corridor.traci.lane, "getLength", lambda _: 200.0)
+    monkeypatch.setattr(
+        corridor.traci.lane,
+        "getLastStepVehicleIDs",
+        lambda _: (_ for _ in ()).throw(AssertionError("traffic should not be inspected")),
+    )
+
+    assert corridor._target_lane_is_safe("civilian", "edge_0", 20.0) is False
+    assert corridor._target_lane_is_safe("civilian", "edge_0", 180.0) is False
+
+
 def test_demand_route_variant_splits_an_odd_count_across_directions(tmp_path: Path) -> None:
     route_file = corridor._demand_route_file(tmp_path, seed=7, civilian_count=101)
     flows = {
@@ -82,6 +138,25 @@ def test_demand_route_variant_splits_an_odd_count_across_directions(tmp_path: Pa
 
     assert flows == {"civilian_northbound": 50, "civilian_southbound": 51}
     assert route_file.parent == tmp_path / "inputs"
+
+
+def test_resume_rejects_results_from_an_older_safety_policy(tmp_path: Path) -> None:
+    summary = {
+        "scenario_version": corridor.SCENARIO_VERSION - 1,
+        "mode": "yielding",
+        "seed": 42,
+        "civilian_vehicles_expected": 160,
+        "ambulance_arrived": True,
+        "safety": {"physical_collisions": 0},
+    }
+    path = tmp_path / "run_summary_yielding.json"
+    path.write_text(json.dumps(summary), encoding="utf-8")
+
+    assert corridor._completed_mode_summary(tmp_path, "yielding", 42, 160) is None
+
+    summary["scenario_version"] = corridor.SCENARIO_VERSION
+    path.write_text(json.dumps(summary), encoding="utf-8")
+    assert corridor._completed_mode_summary(tmp_path, "yielding", 42, 160) == summary
 
 
 def test_batch_matrix_aggregates_paired_results_without_running_sumo(monkeypatch, tmp_path: Path) -> None:

@@ -89,16 +89,59 @@ class NearestFreeDispatcher:
                 path, estimate = route
                 candidates.append((estimate, unit.unit_id, path))
         if not candidates:
-            call.status = CallStatus.PENDING
             return None
         estimate, unit_id, path = min(candidates, key=lambda row: (row[0], row[1]))
-        unit = self.units[unit_id]
-        assignment = Assignment(call_id, unit_id, path, estimate, len(call.assignments) + 1, unit.unit_type)
+        return self._commit_assignment(call, self.units[unit_id], path, estimate)
+
+    def assign_unit(
+        self,
+        call_id: str,
+        unit_id: str,
+        route_provider: RouteProvider,
+    ) -> Assignment | None:
+        """Assign one explicitly selected feasible unit.
+
+        RL and interactive adapters may choose a unit, but this module retains
+        ownership of availability, resource-type and route-feasibility
+        invariants. An invalid selection leaves the call pending.
+        """
+        call = self.calls[call_id]
+        unit = self.units.get(unit_id)
+        if call.status is not CallStatus.PENDING:
+            return None
+        if (
+            unit is None
+            or unit.status is not UnitStatus.AVAILABLE
+            or unit.unit_type is not call.required_unit_type
+        ):
+            return None
+        route = route_provider(unit, call)
+        if route is None:
+            return None
+        path, estimate = route
+        return self._commit_assignment(call, unit, path, estimate)
+
+    @staticmethod
+    def _commit_assignment(
+        call: EmergencyCall,
+        unit: EmergencyUnit,
+        path: tuple[str, ...],
+        estimate: float,
+    ) -> Assignment:
+        unit_id = unit.unit_id
+        assignment = Assignment(
+            call.call_id,
+            unit_id,
+            path,
+            estimate,
+            len(call.assignments) + 1,
+            unit.unit_type,
+        )
         call.assignments.append(assignment)
         call.status = CallStatus.ASSIGNED
         call.assigned_unit_id = unit_id
         unit.status = UnitStatus.BUSY
-        unit.active_call_id = call_id
+        unit.active_call_id = call.call_id
         return assignment
 
     def mark_unavailable(self, unit_id: str) -> EmergencyCall | None:

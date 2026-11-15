@@ -1,14 +1,17 @@
 """Run deterministic SUMO baselines and persist experiment artefacts.
 
-It supports static emergency routes and a minimal nearest-free dispatcher with
-automatic reassignment. Weather, collision modelling and RL remain outside it.
+The harness integrates routing baselines, dispatching, weather, driver state,
+road incidents and safety metrics. RL policies remain outside this runner.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
+import heapq
+import itertools
 import json
+import math
 import random
 import statistics
 import subprocess
@@ -18,7 +21,8 @@ import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from time import perf_counter
+from typing import Any, Callable
 
 import sumolib
 import traci
@@ -37,7 +41,7 @@ from agents.incident.triage import IncidentAssessment, ResponsePlanner
 from agents.routing.routing import route_avoids_closed_lanes
 from simulation.weather.model import WeatherProfile, profile_from_config
 VALID_TLS_MODES = {"normal", "off"}
-VALID_ROUTING_STRATEGIES = {"dijkstra", "traffic_aware"}
+VALID_ROUTING_STRATEGIES = {"dijkstra", "astar", "traffic_aware"}
 VALID_EMERGENCY_TACTICS = {"standard", "blue_light"}
 INCIDENT_ROUTE_TARGET = "first_active_emergency_route"
 RESPONSE_UNIT_FIELDS: tuple[tuple[UnitType, str], ...] = (
@@ -45,6 +49,7 @@ RESPONSE_UNIT_FIELDS: tuple[tuple[UnitType, str], ...] = (
     (UnitType.AMBULANCE, "ambulance_units"),
     (UnitType.FIRE_RESCUE, "fire_rescue_units"),
 )
+_ASTAR_SCALE_CACHE: dict[tuple[int, str], float] = {}
 
 
 @dataclass(frozen=True)
@@ -133,6 +138,8 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
             raise ValueError(f"incident.target must be {INCIDENT_ROUTE_TARGET}")
         if int(incident.get("route_edge_offset", 2)) < 1:
             raise ValueError("incident.route_edge_offset must be at least 1")
+        if float(incident.get("minimum_lead_distance_meters", 0.0)) < 0:
+            raise ValueError("incident.minimum_lead_distance_meters must not be negative")
         for field in required_incident_fields:
             if float(incident[field]) < 0:
                 raise ValueError(f"incident.{field} must not be negative")
@@ -143,16 +150,31 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
             raise ValueError("incident assessment counts must not be negative")
 
 
-def choose_future_route_edge(route_edges: tuple[str, ...], current_route_index: int,
-                             lane_count_by_edge: Callable[[str], int], offset: int) -> str | None:
+def choose_future_route_edge(
+    route_edges: tuple[str, ...],
+    current_route_index: int,
+    lane_count_by_edge: Callable[[str], int],
+    offset: int,
+    *,
+    edge_length_by_edge: Callable[[str], float] | None = None,
+    minimum_lead_distance_meters: float = 0.0,
+    candidate_is_viable: Callable[[str], bool] | None = None,
+) -> str | None:
     """Pick a driveable edge still ahead of a vehicle, never its destination.
 
     The closure is tied to an active emergency route so the scenario can prove
     rerouting on any imported map without hard-coding unstable OSM edge IDs.
     """
     first_candidate = max(0, current_route_index + offset)
-    for edge_id in route_edges[first_candidate:-1]:
-        if not edge_id.startswith(":") and lane_count_by_edge(edge_id) > 0:
+    lead_distance = 0.0
+    for index in range(max(0, current_route_index + 1), len(route_edges) - 1):
+        edge_id = route_edges[index]
+        if edge_length_by_edge is not None and not edge_id.startswith(":"):
+            lead_distance += float(edge_length_by_edge(edge_id))
+        if index < first_candidate or lead_distance < minimum_lead_distance_meters:
+            continue
+        if (not edge_id.startswith(":") and lane_count_by_edge(edge_id) > 0
+                and (candidate_is_viable is None or candidate_is_viable(edge_id))):
             return edge_id
     return None
 
@@ -214,12 +236,142 @@ def passenger_component(net: sumolib.net.Net) -> list[sumolib.net.edge.Edge]:
     return component if len(component) >= 2 else candidates
 
 
+def _astar_heuristic_scale(net: sumolib.net.Net, v_class: str) -> float:
+    """Derive a consistent geometric scale for this edge-cost graph.
+
+    Networks loaded without internal junction lanes assign no connector cost.
+    Raw Euclidean distance can therefore overestimate the remaining graph cost.
+    The minimum transition ratio keeps the heuristic consistent while retaining
+    useful geometric guidance.
+    """
+    cache_key = (id(net), v_class)
+    cached = _ASTAR_SCALE_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+    scale = 1.0
+    for edge in net.getEdges():
+        if edge.isSpecial() or not edge.allows(v_class):
+            continue
+        edge_x, edge_y = edge.getToNode().getCoord()
+        for next_edge, connections in edge.getOutgoing().items():
+            if not next_edge.allows(v_class) or not any(
+                connection.allows(v_class) for connection in connections
+            ):
+                continue
+            next_x, next_y = next_edge.getToNode().getCoord()
+            displacement = math.hypot(next_x - edge_x, next_y - edge_y)
+            if displacement > 0:
+                scale = min(scale, float(next_edge.getLength()) / displacement)
+    scale = max(0.0, min(1.0, scale))
+    _ASTAR_SCALE_CACHE[cache_key] = scale
+    return scale
+
+
+def _astar_heuristic(
+    edge: sumolib.net.edge.Edge,
+    destination: sumolib.net.edge.Edge,
+    scale: float,
+) -> float:
+    """Return an admissible straight-line lower bound in SUMO network metres."""
+    if edge == destination:
+        return 0.0
+    current_x, current_y = edge.getToNode().getCoord()
+    target_x, target_y = destination.getToNode().getCoord()
+    return scale * math.hypot(target_x - current_x, target_y - current_y)
+
+
+def _connection_cost(
+    net: sumolib.net.Net,
+    connections: list[sumolib.net.connection.Connection],
+    v_class: str,
+) -> float | None:
+    """Return the shortest permitted internal-connector cost between two edges."""
+    allowed = [connection for connection in connections if connection.allows(v_class)]
+    if not allowed:
+        return None
+    if not net.hasInternal:
+        return 0.0
+    _, internal_cost = net.getInternalPath(allowed, fastest=False)
+    return float(internal_cost)
+
+
+def astar_path(
+    net: sumolib.net.Net,
+    origin: sumolib.net.edge.Edge,
+    destination: sumolib.net.edge.Edge,
+    *,
+    v_class: str,
+    forbidden_edge_ids: set[str] | None = None,
+) -> tuple[tuple[sumolib.net.edge.Edge, ...] | None, float]:
+    """Find a shortest permitted edge path using A* and a geometric heuristic."""
+    forbidden_edge_ids = forbidden_edge_ids or set()
+    if origin.getID() in forbidden_edge_ids or destination.getID() in forbidden_edge_ids:
+        return None, math.inf
+    if not origin.allows(v_class) or not destination.allows(v_class):
+        return None, math.inf
+
+    serial = itertools.count()
+    origin_id = origin.getID()
+    destination_id = destination.getID()
+    initial_cost = float(origin.getLength())
+    heuristic_scale = _astar_heuristic_scale(net, v_class)
+    frontier: list[tuple[float, float, int, sumolib.net.edge.Edge]] = [
+        (
+            initial_cost + _astar_heuristic(origin, destination, heuristic_scale),
+            initial_cost,
+            next(serial),
+            origin,
+        )
+    ]
+    best_cost = {origin_id: initial_cost}
+    came_from: dict[str, str] = {}
+    edges_by_id = {origin_id: origin}
+
+    while frontier:
+        _, cost, _, edge = heapq.heappop(frontier)
+        edge_id = edge.getID()
+        if cost > best_cost.get(edge_id, math.inf):
+            continue
+        if edge_id == destination_id:
+            path_ids = [destination_id]
+            while path_ids[-1] != origin_id:
+                path_ids.append(came_from[path_ids[-1]])
+            path_ids.reverse()
+            return tuple(edges_by_id[path_id] for path_id in path_ids), cost
+
+        for next_edge, connections in edge.getOutgoing().items():
+            if next_edge.getID() in forbidden_edge_ids or not next_edge.allows(v_class):
+                continue
+            connector_cost = _connection_cost(net, connections, v_class)
+            if connector_cost is None:
+                continue
+            next_id = next_edge.getID()
+            next_cost = cost + connector_cost + float(next_edge.getLength())
+            if next_cost >= best_cost.get(next_id, math.inf):
+                continue
+            best_cost[next_id] = next_cost
+            came_from[next_id] = edge_id
+            edges_by_id[next_id] = next_edge
+            heapq.heappush(
+                frontier,
+                (
+                    next_cost + _astar_heuristic(next_edge, destination, heuristic_scale),
+                    next_cost,
+                    next(serial),
+                    next_edge,
+                ),
+            )
+    return None, math.inf
+
+
 def choose_path(net: sumolib.net.Net, pool: list[sumolib.net.edge.Edge], rng: random.Random,
                 strategy: str) -> tuple[str, ...]:
     for _ in range(2_000):
         origin, destination = rng.sample(pool, 2)
         if strategy == "dijkstra":
             path, _ = net.getShortestPath(origin, destination, vClass="passenger")
+        elif strategy == "astar":
+            path, _ = astar_path(net, origin, destination, v_class="passenger")
         else:
             path, _ = net.getFastestPath(origin, destination, vClass="passenger")
         if path and len(path) >= 2:
@@ -271,6 +423,8 @@ def dispatcher_route_provider(net: sumolib.net.Net, strategy: str):
         origin, destination = net.getEdge(unit.edge_id), net.getEdge(call.destination_edge_id)
         if strategy == "dijkstra":
             path, cost = net.getShortestPath(origin, destination, vClass="emergency")
+        elif strategy == "astar":
+            path, cost = astar_path(net, origin, destination, v_class="emergency")
         else:
             path, cost = net.getFastestPath(origin, destination, vClass="emergency")
         if not path or len(path) < 2:
@@ -362,7 +516,9 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
     safety_config = scenario.get("safety", {"enabled": False})
     safety_enabled = safety_config.get("enabled", False)
     dispatcher_enabled = dispatcher_config.get("enabled", False)
+    route_planning_started = perf_counter()
     specs = build_vehicle_specs(net, scenario, include_emergency=not dispatcher_enabled)
+    initial_route_planning_seconds = perf_counter() - route_planning_started
     civilian_ids = [spec.vehicle_id for spec in specs if not spec.emergency]
     emergency_ids = [spec.vehicle_id for spec in specs if spec.emergency]
     dispatcher: NearestFreeDispatcher | None = None
@@ -391,6 +547,17 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
     if blue_light:
         command.extend(["--lateral-resolution", str(tactics_config["lateral_resolution_meters"]),
                         "--device.bluelight.reactiondist", str(tactics_config["reaction_distance_meters"])])
+    if scenario["routing_strategy"] == "traffic_aware":
+        # Equip every vehicle before departure. This lets SUMO repair a route
+        # that became invalid after a dynamic lane closure, including routes
+        # for vehicles that were already parsed but have not departed yet.
+        reroute_period = str(int(scenario.get("reroute_period_seconds", 30)))
+        command.extend([
+            "--device.rerouting.probability", "1",
+            "--device.rerouting.deterministic",
+            "--device.rerouting.period", reroute_period,
+            "--device.rerouting.pre-period", "1",
+        ])
     if weather_profile.surface_friction < 1:
         command.extend(["--device.friction.probability", "1"])
     if safety_enabled:
@@ -407,6 +574,8 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
     incident_reroutes = 0
     incident_message_deliveries = 0
     reroutes = 0
+    traffic_reroute_suspended: set[str] = set()
+    traffic_reroute_skip_logged: set[str] = set()
     next_reroute = int(scenario.get("reroute_period_seconds", 30))
     dynamic_specs: list[VehicleSpec] = []
     mission_by_vehicle: dict[str, tuple[str, str]] = {}
@@ -592,16 +761,37 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
                 # unrelated street in a city-scale experiment.
                 for vehicle_id in sorted(active & active_emergency_ids):
                     route_edges = tuple(traci.vehicle.getRoute(vehicle_id))
+                    route_index = traci.vehicle.getRouteIndex(vehicle_id)
+                    if not route_edges or route_index < 0 or route_index >= len(route_edges):
+                        continue
+                    destination_edge = destination_by_vehicle.get(vehicle_id, route_edges[-1])
+                    current_route_edge = route_edges[route_index]
+
+                    def candidate_has_detour(candidate_edge: str) -> bool:
+                        alternative, _ = astar_path(
+                            net,
+                            net.getEdge(current_route_edge),
+                            net.getEdge(destination_edge),
+                            v_class="emergency",
+                            forbidden_edge_ids={candidate_edge},
+                        )
+                        return alternative is not None
+
                     target_edge = choose_future_route_edge(
                         route_edges,
-                        traci.vehicle.getRouteIndex(vehicle_id),
+                        route_index,
                         traci.edge.getLaneNumber,
                         int(incident_config.get("route_edge_offset", 2)),
+                        edge_length_by_edge=lambda edge_id: net.getEdge(edge_id).getLength(),
+                        minimum_lead_distance_meters=float(
+                            incident_config.get("minimum_lead_distance_meters", 0.0)
+                        ),
+                        candidate_is_viable=candidate_has_detour,
                     )
                     if target_edge is None:
                         continue
                     access_edge = choose_incident_access_edge(
-                        route_edges, traci.vehicle.getRouteIndex(vehicle_id), target_edge, traci.edge.getLaneNumber,
+                        route_edges, route_index, target_edge, traci.edge.getLaneNumber,
                     )
                     if access_edge is None:
                         continue
@@ -704,12 +894,32 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
                         new_route = tuple(alternative.edges)
                         closed_lanes = set(message.payload["closed_lanes"])
                         if not new_route or not route_avoids_closed_lanes(new_route, closed_lanes):
+                            closed_edges = {lane_id.rsplit("_", 1)[0] for lane_id in closed_lanes}
+                            route_index = traci.vehicle.getRouteIndex(message.recipient)
+                            current_route = tuple(traci.vehicle.getRoute(message.recipient))
+                            current_route_edge = (
+                                current_route[route_index]
+                                if 0 <= route_index < len(current_route)
+                                else current_edge
+                            )
+                            fallback, _ = astar_path(
+                                net,
+                                net.getEdge(current_route_edge),
+                                net.getEdge(destination_edge),
+                                v_class="emergency",
+                                forbidden_edge_ids=closed_edges,
+                            )
+                            new_route = tuple(edge.getID() for edge in fallback) if fallback else ()
+                        if not new_route or not route_avoids_closed_lanes(new_route, closed_lanes):
+                            traffic_reroute_suspended.add(message.recipient)
                             events.append({"time_seconds": time, "event": "reroute_unavailable",
                                            "vehicle_id": message.recipient,
                                            "incident_id": message.payload["incident_id"]})
                             continue
                         old_route = tuple(traci.vehicle.getRoute(message.recipient))
                         traci.vehicle.setRoute(message.recipient, list(new_route))
+                        traffic_reroute_suspended.discard(message.recipient)
+                        traffic_reroute_skip_logged.discard(message.recipient)
                         incident_reroutes += 1
                         events.append({"time_seconds": time, "event": "emergency_rerouted",
                                        "vehicle_id": message.recipient, "old_route": list(old_route),
@@ -771,7 +981,28 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
                 next_rescue_lane_scan = time + rescue_lane_scan_period
             if scenario["routing_strategy"] == "traffic_aware" and time >= next_reroute:
                 for emergency_id in active & active_emergency_ids:
-                    traci.vehicle.rerouteTraveltime(emergency_id, currentTravelTimes=True)
+                    if emergency_id in traffic_reroute_suspended:
+                        if emergency_id not in traffic_reroute_skip_logged:
+                            events.append({"time_seconds": time, "event": "traffic_reroute_suspended",
+                                           "vehicle_id": emergency_id,
+                                           "reason": "no_safe_route_around_active_closure"})
+                            traffic_reroute_skip_logged.add(emergency_id)
+                        continue
+                    try:
+                        traci.vehicle.rerouteTraveltime(emergency_id, currentTravelTimes=True)
+                    except traci.TraCIException as error:
+                        traffic_reroute_suspended.add(emergency_id)
+                        events.append({"time_seconds": time, "event": "traffic_reroute_unavailable",
+                                       "vehicle_id": emergency_id, "reason": str(error)})
+                        continue
+                    rerouted_path = tuple(traci.vehicle.getRoute(emergency_id))
+                    closed_lanes = incident_manager.closed_lanes() if incident_manager else set()
+                    if closed_lanes and not route_avoids_closed_lanes(rerouted_path, closed_lanes):
+                        traffic_reroute_suspended.add(emergency_id)
+                        events.append({"time_seconds": time, "event": "traffic_reroute_unavailable",
+                                       "vehicle_id": emergency_id,
+                                       "reason": "route_still_intersects_active_closure"})
+                        continue
                     reroutes += 1
                     events.append({"time_seconds": time, "event": "rerouted", "vehicle_id": emergency_id})
                 next_reroute += int(scenario.get("reroute_period_seconds", 30))
@@ -835,6 +1066,10 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
     final_driver_states = list(driver_model.states.values()) if driver_model is not None else []
     metrics = {
         "total_vehicles": len(rows), "ordinary_vehicles": len(civilian), "emergency_vehicles": len(emergency_rows),
+        "initial_route_planning_seconds": initial_route_planning_seconds,
+        "initial_route_planning_mean_ms_per_vehicle": (
+            initial_route_planning_seconds / len(specs) * 1_000 if specs else 0.0
+        ),
         "emergency_calls": len(calls),
         "completed_vehicles": sum(bool(row["arrived"]) for row in rows),
         "successful_calls": sum(bool(row["success"]) for row in calls),
@@ -877,8 +1112,10 @@ def run_experiment(scenario_path: Path, output_root: Path | None = None,
                 "emergency_tactics": tactics_config,
                 "emergency_driver": emergency_driver_config,
                 "safety": safety_config,
-                "limitations": ["No weather or collision model yet",
-                                "Yielding is a seeded behavioural approximation, not calibrated driver psychology"]}
+                "limitations": [
+                    "Traffic demand is synthetic and not calibrated from Astana detector counts",
+                    "Yielding is a seeded behavioural approximation, not calibrated driver psychology",
+                ]}
     (result_dir / "run_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (result_dir / "summary.txt").write_text(
         f"{run_id}: {metrics['completed_vehicles']}/{metrics['total_vehicles']} vehicles, "

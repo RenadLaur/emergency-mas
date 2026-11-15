@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connections>
+    <connection from="depot_0_in" to="hub_to_split" fromLane="0" toLane="0"/>
+    <connection from="depot_1_in" to="hub_to_split" fromLane="0" toLane="0"/>
+    <connection from="depot_2_in" to="hub_to_split" fromLane="0" toLane="0"/>
+    <connection from="depot_3_in" to="hub_to_split" fromLane="0" toLane="0"/>
+    <connection from="hub_to_split" to="upper_in" fromLane="0" toLane="0"/>
+    <connection from="hub_to_split" to="center_in" fromLane="0" toLane="0"/>
+    <connection from="hub_to_split" to="lower_in" fromLane="0" toLane="0"/>
+    <connection from="upper_in" to="upper_out" fromLane="0" toLane="0"/>
+    <connection from="center_in" to="center_out" fromLane="0" toLane="0"/>
+    <connection from="lower_in" to="lower_out" fromLane="0" toLane="0"/>
+    <connection from="upper_out" to="finish" fromLane="0" toLane="0"/>
+    <connection from="center_out" to="finish" fromLane="0" toLane="0"/>
+    <connection from="lower_out" to="finish" fromLane="0" toLane="0"/>
+</connections>

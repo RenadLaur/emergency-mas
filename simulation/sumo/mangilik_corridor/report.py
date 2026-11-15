@@ -149,6 +149,28 @@ def _plot_safety(matrix: dict[str, Any], output_path: Path) -> None:
             color=MODE_COLORS[mode],
         )
 
+    collision_total = sum(
+        aggregates[str(count)]["modes"][mode]["metrics"]["physical_collisions"][
+            "mean"
+        ]
+        * aggregates[str(count)]["modes"][mode]["runs"]
+        for count in counts
+        for mode in matrix["modes"]
+    )
+    if collision_total == 0:
+        total_runs = len(matrix["seeds"]) * len(counts) * len(matrix["modes"])
+        axes[1].text(
+            0.5,
+            0.5,
+            f"No physical collisions\nin {total_runs} runs",
+            transform=axes[1].transAxes,
+            ha="center",
+            va="center",
+            fontsize=14,
+            color="#166534",
+        )
+        axes[1].set_ylim(0, 1)
+
     axes[0].set_title("Near-miss events")
     axes[1].set_title("Physical collisions")
     axes[1].set_xticks(positions, [str(count) for count in counts])

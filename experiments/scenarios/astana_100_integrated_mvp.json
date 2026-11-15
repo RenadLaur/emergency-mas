@@ -1,0 +1,54 @@
+{
+  "run_id": "astana-100-integrated-mvp-seed42",
+  "network": "simulation/maps/astana_city/generated/astana_city.net.xml",
+  "seed": 42,
+  "ordinary_vehicles": 100,
+  "emergency_vehicles": 2,
+  "ordinary_departure_window_seconds": 600,
+  "experiment_end_seconds": 2400,
+  "tls_mode": "normal",
+  "routing_strategy": "traffic_aware",
+  "weather": {
+    "condition": "rain"
+  },
+  "emergency_driver": {
+    "enabled": true
+  },
+  "safety": {
+    "enabled": true,
+    "ttc_threshold_seconds": 2.0,
+    "observation_period_seconds": 2.0
+  },
+  "emergency_tactics": {
+    "mode": "blue_light",
+    "lateral_resolution_meters": 0.4,
+    "reaction_distance_meters": 75,
+    "speed_factor": 1.15
+  },
+  "dispatcher": {
+    "enabled": true,
+    "call_times_seconds": [30],
+    "fleet": {
+      "ambulance": 2,
+      "police": 1,
+      "fire_rescue": 1
+    }
+  },
+  "incident": {
+    "enabled": true,
+    "target": "first_active_emergency_route",
+    "starts_at_seconds": 80,
+    "route_edge_offset": 2,
+    "minimum_lead_distance_meters": 500,
+    "detection_delay_seconds": 5,
+    "report_latency_seconds": 5,
+    "vehicle_command_latency_seconds": 2,
+    "assessment": {
+      "estimated_injured": 1,
+      "blocked_lanes": 1,
+      "fire_or_smoke": false,
+      "people_trapped": false,
+      "hazardous_material": false
+    }
+  }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes>
+    <node id="depot_0" x="-180" y="0" type="priority"/>
+    <node id="depot_1" x="-260" y="80" type="priority"/>
+    <node id="depot_2" x="-260" y="-80" type="priority"/>
+    <node id="depot_3" x="-340" y="0" type="priority"/>
+    <node id="hub" x="-50" y="0" type="priority"/>
+    <node id="split" x="0" y="0" type="priority"/>
+    <node id="upper" x="160" y="90" type="priority"/>
+    <node id="center" x="160" y="0" type="priority"/>
+    <node id="lower" x="160" y="-90" type="priority"/>
+    <node id="merge" x="320" y="0" type="priority"/>
+    <node id="destination" x="430" y="0" type="priority"/>
+</nodes>

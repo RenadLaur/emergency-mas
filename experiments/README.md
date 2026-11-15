@@ -14,8 +14,10 @@ python experiments/baseline_runner.py experiments/scenarios/astana_100_baseline.
 Результат сохраняется в `experiments/results/<run_id>/`: входной сценарий,
 маршруты, события, `vehicles.csv`, `calls.csv`, `metrics.json` и метаданные.
 Для сравнения `normal` и `off` создаётся копия сценария с другим `run_id` и
-`tls_mode`. Режим `traffic_aware` периодически пересчитывает маршруты только
-экстренных машин по текущему времени проезда; это не ML-политика.
+`tls_mode`. В режиме `traffic_aware` штатное rerouting-устройство SUMO
+пересчитывает маршруты всех машин, в том числе до выезда при динамическом
+перекрытии; экстренные машины дополнительно управляются через TraCI. Это не
+ML-политика.
 
 `experiment_end_seconds` ограничивает длительность контрольного прогона в
 симуляционных секундах. Он нужен для большой карты: события до лимита и все
@@ -26,6 +28,7 @@ python experiments/baseline_runner.py experiments/scenarios/astana_100_baseline.
 Готовая первая матрица находится в `experiments/scenarios/`:
 
 - `astana_100_baseline.json` — normal + Dijkstra;
+- `astana_100_normal_astar.json` — normal + A* с евклидовой эвристикой;
 - `astana_100_off_dijkstra.json` — TLS off + Dijkstra;
 - `astana_100_normal_traffic_aware.json` — normal + traffic-aware.
 - `astana_100_normal_yielding.json` — normal + Dijkstra + реакция обычных водителей на сирену.
@@ -42,6 +45,9 @@ python experiments/baseline_runner.py experiments/scenarios/astana_100_baseline.
 - `astana_100_driver_state.json` — 100 машин в дождь с динамическим состоянием
   водителей экстренных экипажей.
 - `astana_100_safety.json` — 100 машин с журналированием TTC и near-miss.
+- `astana_100_integrated_mvp.json` — сквозной Inc 13: Dispatcher, дождь,
+  состояние водителя, TTC, blue-light и инцидент с задержанной связью и
+  дополнительными службами в одном воспроизводимом прогоне.
 
 В Dispatcher-сценарии `calls.csv` показывает все попытки, машину и финальный
 статус каждого вызова. Искусственная недоступность нужна только для
@@ -81,9 +87,13 @@ blue-light, умеренное превышение лимита скорост�
 о границах метрики — в `docs/SAFETY_MODEL.md`.
 
 `incident` выбирает полосу на маршруте уже движущейся экстренной машины, а не
-жёстко заданный нестабильный OSM edge ID. После активации закрываются все полосы
-этого ребра; Incident Agent ждёт задержку обнаружения, затем отправляет отчёт
-Dispatcher Agent. Только после доставки команды машине вызывается SUMO reroute.
+жёстко заданный нестабильный OSM edge ID. Кандидат должен находиться не ближе
+`minimum_lead_distance_meters` и иметь альтернативный путь до назначения. После
+активации закрываются все полосы этого ребра; Incident Agent ждёт задержку
+обнаружения, затем отправляет отчёт Dispatcher Agent. Только после доставки
+команды машине вызывается SUMO reroute. В `traffic_aware` будущие гражданские
+машины также получают исправленный маршрут до выезда, поэтому динамическое
+перекрытие не делает заранее созданный маршрут недействительным.
 В `event_log.jsonl` должны последовательно появиться `incident_activated`,
 `incident_detected`, `dispatcher_response_plan`, `response_call_created`,
 `dispatcher_assigned`, `dispatcher_reroute_command_sent` и
@@ -91,3 +101,42 @@ Dispatcher Agent. Только после доставки команды маш
 `response_call_created` создаёт реальный SUMO-экипаж подходящего типа. Его
 назначение идёт на доступное ребро перед закрытым участком (`scene_access_edge`),
 а не внутрь перекрытой дороги.
+
+## PPO smoke
+
+Технический цикл обучения запускается командой:
+
+```bash
+PYTHONPATH=. python -m ai.training.ppo_smoke \
+  --seed 42 --updates 20 --rollout-steps 256 \
+  --evaluation-episodes 100 --sumo-evaluation-episodes 3 \
+  --output-dir experiments/results/ppo-smoke-seed42
+```
+
+Он обучает cooperative PPO на быстрой PettingZoo-среде, сравнивает результат с
+uniform-random допустимыми действиями на тех же seed и делает короткую проверку
+в SUMO. Полный протокол и ограничения приведены в `docs/PPO_TRAINING.md`.
+
+Флаги `--astana-evaluation-episodes 1 --astana-ordinary-vehicles 100
+--astana-episode-calls 3` дополнительно запускают обученную policy на полной
+карте Астаны. Один эпизод дорогой и служит только интеграционной проверкой;
+статистическая серия должна использовать заранее зафиксированные test seed.
+Флаг `--city-finetune-updates` добавляет PPO updates непосредственно на
+многовызовном городском backend.
+
+## Единая RL-матрица
+
+`experiments/rl_policy_matrix.py` сравнивает random, nearest, Dijkstra, A*,
+traffic-aware и PPO через один городской интерфейс. Вызовы и срочность
+фиксируются до первого решения policy. Runner проверяет, что при одном seed все
+алгоритмы получили одну последовательность destination edge, и пишет
+`matrix.json`, `summary.csv`, `calls.csv`.
+
+```bash
+PYTHONPATH=. python -m experiments.rl_policy_matrix \
+  --policies random,nearest,dijkstra,astar,traffic_aware,ppo \
+  --seeds 4201,4202,4203,4204,4205 \
+  --ordinary-vehicles 100 --episode-calls 3 \
+  --checkpoint experiments/results/ppo-smoke-seed42/policy.pt \
+  --output experiments/results/rl-policy-matrix-test
+```
